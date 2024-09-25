@@ -12,7 +12,7 @@ Post-History: TBD
 Abstract
 ========
 
-`PEP 508 <https://peps.python.org/pep-0508/>`_ specifies a mini-language for
+:pep:`508` specifies a mini-language for
 declaring package dependencies. One feature of this language is the ability to
 specify *extras*, which are optional components of a distribution that, when
 used, install additional dependencies. This PEP proposes a mechanism to allow
@@ -80,7 +80,7 @@ Unselecting Default Extras
 --------------------------
 
 A new syntax for *unselecting* extras will be introduced as an extension of the
-mini-language defined in `PEP 508 <https://peps.python.org/pep-0508/>`_. If a
+mini-language defined in :pep:`508`. If a
 package defines default extras, users can opt out of these defaults by using a
 minus sign (``-``) before the extra name. The proposed syntax update is as follows::
 
@@ -111,9 +111,9 @@ isn't needed, not that it must be absent.
 Backward Compatibility
 ======================
 
-All package specification cases valid under `PEP 508 <https://peps.python.org/pep-0508/>`_
-will remain valid. Therefore, this proposal is fully backward-compatible with
-existing `PEP 508` usage.
+All package specification cases valid under :pep:`508` will remain valid.
+Therefore, this proposal is fully backward-compatible with existing :pep:`508`
+usage.
 
 Users will gain the ability to deselect default extras once a package defines
 default extras and the package installation tools (e.g., pip) support the new syntax.
@@ -152,8 +152,8 @@ several issues with this approach:
   the default extras).
 
 This approach was one of those discussed extensively in
-`https://github.com/pypa/setuptools/issues/1139` and
-`https://github.com/pypa/setuptools/pull/1503`.
+https://github.com/pypa/setuptools/issues/1139 and
+https://github.com/pypa/setuptools/pull/1503.
 
 ``Default-Extras`` only apply if no other extras are specified
 --------------------------------------------------------------
