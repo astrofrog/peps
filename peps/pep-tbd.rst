@@ -165,7 +165,7 @@ explicitly requested.
 
 However, this would not be sufficient. Similar to the approach of using a special entry
 in ``extras_require``, there would be no way to remove default extras without
-selecting a new extra. Thus, there would be no way to do a minimal installation, and
+selecting a new extra, thus there would be no way to do a minimal installation. In addition,
 users might be surprised if specifying an extra resulted in some dependencies no longer
 being installed.
 
@@ -188,9 +188,9 @@ option for the ``apt`` tool.
 
 However, this solution is not ideal because it would not allow packages to
 specify themselves that they do not need some of the default extras of a
-dependency. It would also carry risks for users who might disable all
-default extras, potentially breaking packages in the dependency tree that rely on
-the default extras.
+dependency. It would also carry risks for users who might disable all default
+extras in a big dependency tree, potentially breaking packages in the tree that
+rely on default extras at any point.
 
 Disabling all default extras
 ----------------------------
