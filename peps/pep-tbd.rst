@@ -123,5 +123,33 @@ Specifying any extras explicitly unselects all defaults
 
 An alternative considered was that specifying any extras would automatically
 unselect all default extras, removing the need for a new syntax for unselecting.
+However, this would not be sufficient, as there would be no way of removing
+default extras without adding a new extras - i.e. there would be no way of
+doing a minimal installation.
 
-TBD - Further discussion is required to determine if this is the preferred approach.
+Relying on tooling to deselect any default extras
+-------------------------------------------------
+
+Another option to unselect extras would be to have this be implemented at the
+level of packaging tools. For instance, pip could include an option such as::
+
+    pip install package --no-default-extras
+
+which would then require all desired extras to be explicitly specified. This
+could also be made to be applicable to all or just specific packages, similar to
+e.g. the ``--no-binary`` option, so::
+
+    pip install package --no-default-extras :all:
+
+or specifying specific packages to ignore the defaults from. The advantage of
+this approach would be that it would be guaranteed that tools that support
+installing the defaults also support unselecting them.
+
+By comparison, with the - syntax, if a package deep down the dependency tree
+uses the ``-`` syntax in its dependency list, any other package depending on it
+would only be installable with recent packaging tooling.
+
+This approach would be similar to the ``--no-install-recommends`` option for the
+``apt`` tool.
+
+TBD: determine if this is actually a better solution?
