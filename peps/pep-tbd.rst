@@ -22,29 +22,30 @@ for these default extras to be "unselected" if desired.
 Motivation
 ==========
 
-Package maintainers often use extras to declare optional dependencies that extend
-the functionality or performance of a package. In some cases, it can be difficult
-to determine which dependencies should be required and which should be categorized
-as extras. A balance must be struck between the needs of typical users (who may
-prefer most features to be available 'by default') and users who want minimal
-installations without large, optional dependencies.
-
-One current solution is to define an extra called, for example, ``recommended``,
-which includes all non-essential but suggested dependencies. Users are then told
-to install the package using ``package[recommended]``, while those who prefer
-more control can simply use ``package``. However, in practice, many users are
-unaware of the ``recommended`` syntax, placing the burden on them to know this
-for a typical installation.
-
-This PEP proposes a method to specify one or more extras to be included by
-default while providing a way for users who prefer a minimal installation
-to opt out of these extras.
+Package maintainers often use extras to declare optional dependencies that
+extend the functionality or performance of a package. In some cases, it can be
+difficult to determine which dependencies should be required and which should be
+categorized as extras. A balance must be struck between the needs of typical
+users (who may prefer most features to be available 'by default') and users who
+want minimal installations without large, optional dependencies. One current
+solution is to define an extra called, for example, ``recommended``, which
+includes all non-essential but suggested dependencies. Users are then told to
+install the package using ``package[recommended]``, while those who prefer more
+control can simply use ``package``. However, in practice, many users are unaware
+of the ``[recommended]`` syntax, placing the burden on them to know this for a
+typical installation.
 
 Another motivating use case is for packages that support different backends or
-frontends, where at least one must be installed for the package to be functional.
-The proposed approach allows maintainers to define default extras for such cases,
-installing a default backend or frontend while offering users the option to opt
-out and install an alternative.
+frontends, where at least one must be installed for the package to be
+functional, but where users may want to install only one of the other backends
+and not the default one.
+
+This PEP proposes a method to specify one or more extras to be included by
+default while providing a way for users to remove one or more of these default
+extras, which would solve both use cases above.
+
+The use cases and possible solutions in this PEP were discussed extensively at
+https://discuss.python.org/t/adding-a-default-extra-require-environment/4898/38.
 
 Specification
 =============
