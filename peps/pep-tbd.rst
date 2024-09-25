@@ -85,20 +85,27 @@ minus sign (`-`) before the extra name. The proposed syntax update is as follows
 
     extras_list   = (-)?identifier (wsp* ',' wsp* (-)?identifier)*
 
-Additionally, an extra cannot appear in both negated and non-negated forms, as
-this would create ambiguity.
+If both an extra and its negated version appear in an extras list, the
+non-negated extra should take precedence.
 
-**Valid new examples:**
+Attempting to unselect an extra that does not exist, or is not in the list of
+default extras, should do nothing. The rationale for these rules is to avoid
+having to build the package simply to validate the name of the extras.
+
+Valid examples of the new syntax include:
 
 * ``package[-recommended]``
 * ``package[-backend1, backend2]``
 * ``package[pdf, -svg]``
+* ``package[pdf, -pdf]`` - same as ``package[pdf]``
+* ``package[-nondefault, pdf]`` where ``nondefault`` is not in ``Default-Extras`` - equivalent to ``package[pdf]``
+* ``package[-nonexistent, svg]`` where ``nonexistent`` is not defined as an extra - equivalent to ``package[svg]``
 
-**Invalid examples:**
-
-* ``package[pdf, -pdf]`` - an extra cannot be both negated and non-negated.
-* ``package[-nondefault]`` - if ``nondefault`` is not specified as a default extra.
-* ``package[-nonexistent]`` - if ``nonexistent`` is not defined as an extra.
+We note that unselecting with ``-`` should *not* be considered to be the same as
+**requiring** that the dependencies are not present, since this would make it
+impossible to interpret a dependency tree containing both ``package[-pdf]`` and
+``package[pdf]``. Unselecting an extra is merely a way of saying that the extras
+isn't needed, not that it has to be absent.
 
 Backward Compatibility
 ======================
@@ -113,19 +120,53 @@ default extras and the package installation tools (e.g., pip) support the new sy
 Implementation
 ==============
 
-TBD
+TBD - once we agree on the best path forward.
 
-Alternatives
-============
+Rejected Alternatives
+=====================
 
-Specifying any extras explicitly unselects all defaults
--------------------------------------------------------
+Adding a special entry in extras_require
+----------------------------------------
 
-An alternative considered was that specifying any extras would automatically
-unselect all default extras, removing the need for a new syntax for unselecting.
-However, this would not be sufficient, as there would be no way of removing
-default extras without adding a new extras - i.e. there would be no way of
-doing a minimal installation.
+A potential solution that has been explored is to make use of an extras with a
+'special' name, for example an empty string:
+
+    Provides-Extra:
+    Requires-Dist: numpy ; extra == ''
+
+The idea would be that dependencies installed as part of the 'empty' extras
+would only get installed if another extras was not specified. However, there are
+several issues with this approach:
+
+* The syntax ``extra == ''`` does not fit in to how extras are evaluated in the
+  context of environment markers, ``extra == 'pdf'`` does not mean that a user
+  specified only the ``pdf`` extra but that ``pdf`` was one of the extras
+  specified. In this context, ``extra == ''`` would not really behave the same,
+  as it does not indicate that no extras were specified at all.
+* The only way to not install the default empty string extras would be to select
+  another extras - there would be no way to have a minimal installation with no
+  extras at all.
+* It might surprise some users that requesting e.g. ``package[pdf]`` may actually
+  result in some dependencies no longer being installed (those that were part of
+  the default extras)
+
+This approach was one of those discussed extensively in
+https://github.com/pypa/setuptools/issues/1139 and
+https://github.com/pypa/setuptools/pull/1503.
+
+``Default-Extras`` only apply if no other extras are specified
+--------------------------------------------------------------
+
+An alternative considered was that default extras would be specified as proposed
+in this PEP, but the - syntax for unselecting dependencies would not be
+introduced. Instead, default extras would apply only if no extras were
+explicitly requested.
+
+However, this would not be sufficient. As for the approach of the special entry
+in ``extras_require``, there would be no way of removing default extras without
+selecting a new extra, and therefore no way of doing a minimal installation, and
+again it might surprising to users to have some dependencies no longer be
+installed just because an extra was specified.
 
 Relying on tooling to deselect any default extras
 -------------------------------------------------
@@ -143,13 +184,34 @@ e.g. the ``--no-binary`` option, so::
 
 or specifying specific packages to ignore the defaults from. The advantage of
 this approach would be that it would be guaranteed that tools that support
-installing the defaults also support unselecting them.
+installing the defaults also support unselecting them. This approach would be
+similar to the ``--no-install-recommends`` option for the ``apt`` tool.
 
-By comparison, with the - syntax, if a package deep down the dependency tree
-uses the ``-`` syntax in its dependency list, any other package depending on it
-would only be installable with recent packaging tooling.
+However, this solution is not ideal because it would not allow packages to
+specify themselves that they do not need some of the default extras of a
+dependency, and would carry a lot of risk for users who would simply disable all
+default extras, potentially risking breaking packages in the dependency tree who
+are relying on the default extras being present.
 
-This approach would be similar to the ``--no-install-recommends`` option for the
-``apt`` tool.
+Having a way of disabling any default extra
+-------------------------------------------
 
-TBD: determine if this is actually a better solution?
+One idea that was raised was to allow a special way of specifying that all
+default dependencies should be unselected, for example ``package[-*]``.
+However, it was deemed that some package maintainers might over-use this option
+to always reject default dependencies.
+
+``package[]`` disables default extras
+---------------------------------------
+
+Another way to specify to not install any extras, including any default extras,
+would be to use ``package[]``. However, this would break the current assumption that
+``package[]`` is the same as ``package``, and may also (similarly to ``-*``) result
+in developers over-using ``[]`` everywhere by default. This approach would also not
+allow any extras to be installed while removing the default ones.
+
+References
+==========
+
+.. [1] Support the /usr/bin/python2 symlink upstream (with bonus grammar class!)
+   (https://mail.python.org/pipermail/python-dev/2011-March/108491.html)
