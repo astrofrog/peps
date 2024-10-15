@@ -78,17 +78,18 @@ the following command, a user has *selected* the ``recommended`` extra::
 
 A new metadata field, ``Default-Extras``, will be added to the `core package
 metadata <https://packaging.python.org/en/latest/specifications/core-metadata/#core-metadata>`_.
-This field allows package maintainers to define one or more extras that are
+This field allows package maintainers to define an extra that is
 automatically selected when a user installs the package without specifying any
-extras. If multiple extras are specified, they should be separated by commas.
-
-Example with a single default extra::
+extras::
 
     Default-Extras: recommended
 
-Example with multiple default extras::
+If multiple default extras are needed, one ``Default-Extras:`` entry
+should be provided for each one.
 
-    Default-Extras: recommended,pdf
+    Default-Extras: backend1
+    Default-Extras: backend2
+    Default-Extras: backend3
 
 Unselecting Default Extras
 --------------------------
