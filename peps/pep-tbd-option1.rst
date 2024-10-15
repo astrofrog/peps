@@ -182,14 +182,12 @@ would only get installed if another extra was not specified. An implementation
 of this was proposed in https://github.com/pypa/setuptools/pull/1503, but it
 was found that there would be no way to make this work without breaking
 compatibility with existing usage. For example, packages using setuptools via
-a setup.py file can do:
+a setup.py file can do::
 
-```
-setup(
-    ...
-    extras_require={'': ['package_a']},
-)
-```
+    setup(
+        ...
+        extras_require={'': ['package_a']},
+    )
 
 which is valid and equivalent to having ``package_a`` being defined in
 ``install_requires``, so changing the meaning of the empty string requires would
@@ -203,7 +201,7 @@ There have been suggestions of using the special ``None`` Python variable, but
 again this is not possible, because even though one can use ``None`` in a ``setup.py`` file,
 this is not possible in declarative files such as ``setup.cfg`` or
 ``pyproject.toml``, and furthermore ultimately extras names have to be converted
-to strings in the package metadata. Having:
+to strings in the package metadata. Having::
 
     Provides-Extra: None
 
@@ -237,12 +235,12 @@ Relying on tooling to deselect any default extras
 Another option to unselect extras would be to implement this at the
 level of packaging tools. For instance, pip could include an option such as::
 
-    pip install package --no-Default-Extra
+    pip install package --no-default-extras
 
 This option could apply to all or specific packages, similar to
 the ``--no-binary`` option, e.g.,::
 
-    pip install package --no-Default-Extra :all:
+    pip install package --no-default-extras :all:
 
 The advantage of this approach is that tools supporting default extras could
 also support unselecting them. This approach would be similar to the ``--no-install-recommends``
