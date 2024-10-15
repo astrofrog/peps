@@ -127,10 +127,34 @@ Backward Compatibility
 
 All package specification cases valid under :pep:`508` will remain valid.
 Therefore, this proposal is fully backward-compatible with existing :pep:`508`
-usage.
-
-Users will gain the ability to deselect default extras once a package defines
+usage. Users will gain the ability to deselect default extras once a package defines
 default extras and the package installation tools (e.g., pip) support the new syntax.
+
+However, it is important to note that the ``-`` syntax for unselecting extras is
+itself not backward-compatible with existing packaging tools. There are two main
+scenarios where this syntax is likely to be used:
+
+* Users setting up an environment with packages using e.g. a pip command, a pip
+  requirement file, or other ways of specifying environments should be able to
+  use the new syntax provided they have a recent version of pip. This is not a
+  major concern because using this syntax will be opt-in and it is likely to be
+  sufficient to document that this can only be used with recent packaging tools.
+
+* Developers defining dependencies for their own packages and deciding to use
+  the ``-`` syntax in dependency lists will be making their packages and all
+  dependent packages incompatible with older versions of packaging tools, since
+  these will crash when encountering ``-`` which is not allowed by :pep:`508`.
+  Using this new syntax in package dependency lists should therefore be done
+  with great caution as it may have an impact on users.
+
+We therefore strongly recommend that package maintainers avoid using the new syntax in
+package dependency lists until they are confident that most users that use their
+package or one of the dependent packages are likely to be using recent versions
+of pip.
+
+This feature should be safe to use in package dependency lists once the package
+only supports Python versions on which all supported versions of packaging tools
+support this feature.
 
 Implementation
 ==============
