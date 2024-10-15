@@ -74,23 +74,23 @@ the following command, a user has *selected* the ``recommended`` extra::
 
     pip install package[recommended]
 
-``Default-Extras`` Metadata Field
+``Default-Extra`` Metadata Field
 ---------------------------------
 
-A new metadata field, ``Default-Extras``, will be added to the `core package
+A new metadata field, ``Default-Extra``, will be added to the `core package
 metadata <https://packaging.python.org/en/latest/specifications/core-metadata/#core-metadata>`_.
 This field allows package maintainers to define an extra that is
 automatically selected when a user installs the package without specifying any
 extras::
 
-    Default-Extras: recommended
+    Default-Extra: recommended
 
-If multiple default extras are needed, one ``Default-Extras:`` entry
+If multiple default extras are needed, one ``Default-Extra:`` entry
 should be provided for each one::
 
-    Default-Extras: backend1
-    Default-Extras: backend2
-    Default-Extras: backend3
+    Default-Extra: backend1
+    Default-Extra: backend2
+    Default-Extra: backend3
 
 Overriding default extras
 -------------------------
@@ -180,7 +180,7 @@ Adding a special entry in ``extras_require``
 --------------------------------------------
 
 A potential solution that has been explored as an alternative to introducing the
-new ``Default-Extras`` metadata field would be to make use of an extra with a
+new ``Default-Extra`` metadata field would be to make use of an extra with a
 'special' name.
 
 One example would be to use an empty string::
@@ -222,7 +222,7 @@ would be indistinguishable from the string 'None' which may already be used as
 an extras name in a Python package. If we were to modify the core metadata
 syntax to allow non-string 'special' extras names, then we would be back to
 modifying the core metadata specification, in which case we might as well
-introduce ``Default-Extras``.
+introduce ``Default-Extra``.
 
 Relying on tooling to deselect any default extras
 -------------------------------------------------
@@ -230,12 +230,12 @@ Relying on tooling to deselect any default extras
 Another option to unselect extras would be to implement this at the
 level of packaging tools. For instance, pip could include an option such as::
 
-    pip install package --no-default-extras
+    pip install package --no-Default-Extra
 
 This option could apply to all or specific packages, similar to
 the ``--no-binary`` option, e.g.,::
 
-    pip install package --no-default-extras :all:
+    pip install package --no-Default-Extra :all:
 
 The advantage of this approach is that tools supporting default extras could
 also support unselecting them. This approach would be similar to the ``--no-install-recommends``
