@@ -1,6 +1,7 @@
 PEP: TBD
 Title: Default Extras for Python Packages
-Author: Thomas Robitaille <thomas.robitaille@gmail.com>
+Author: Thomas Robitaille <thomas.robitaille@gmail.com>,
+        Jonathan Dekhtiar <jonathan@dekhtiar.com>
 Sponsor: TBD
 Discussions-To: TBD
 Status: Draft
