@@ -85,7 +85,7 @@ extras::
     Default-Extras: recommended
 
 If multiple default extras are needed, one ``Default-Extras:`` entry
-should be provided for each one.
+should be provided for each one::
 
     Default-Extras: backend1
     Default-Extras: backend2
