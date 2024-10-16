@@ -122,27 +122,33 @@ In order to do this, a package maintainer would define an extras called
 ``recommended`` containing the recommended but not required dependencies, and
 would choose to have this be included as a default extras. Exactly how this is
 done will depend on the packaging tool, but one could imagine doing something
-as follows in a ``setup.cfg`` file::
+as follows in a ``pyproject.toml`` file:
 
-    [options]
-    ...
-    default_extras =
-        recommended
+.. code-block:: toml
 
-    [options.extras_require]
-    recommended =
-        package1
-        package2
+    [project]
+    default-optional-dependencies = [
+        "recommended"
+    ]
+
+    [project.optional-dependencies]
+    recommended = [
+        "package1",
+        "package2"
+    ]
 
 In this specific case, a package maintainer may want to allow users to also
 install the package without the recommended dependencies, in which case they
-could define an empty extras::
+could define an empty extras:
 
-    [options.extras_require]
-    minimal =
-    recommended =
-        package1
-        package2
+.. code-block:: toml
+
+    [project.optional-dependencies]
+    minimal = []
+    recommended = [
+        "package1",
+        "package2"
+    ]
 
 This would then allow users to install ``package[minimal]`` which, since
 there would be an extras explicitly specified, would mean the default extras
@@ -165,18 +171,23 @@ to support different ones, or a package that can rely on different computational
 backends but needs at least one to be installed.
 
 In this case, package maintainers could make the choice to define an extra
-for each backend or frontend, and provide a default, e.g.::
+for each backend or frontend, and provide a default, e.g.:
 
-    [options]
-    ...
-    default_extras =
-        backend1
+.. code-block:: toml
 
-    [options.extras_require]
-    backend1 =
-        ...
-    backend2 =
-        ...
+    [project]
+    default-optional-dependencies = [
+        "backend1"
+    ]
+
+    [project.optional-dependencies]
+    backend1 = [
+        "package1",
+        "package2"
+    ]
+    backend2 = [
+        "package3"
+    ]
 
 Unlike the previous example however, maintainers would not necessarily provide a
 way to do an installation without any extras since it might leave the package in
@@ -190,28 +201,33 @@ Supporting minimal installations while not always removing default extras
 -------------------------------------------------------------------------
 
 An additional case we consider here is where a package maintainer wants to support
-minimal installations without any extras, but otherwise does not want default extras
-to always be removed. Essentially, they would want:
+minimal installations without any extras, but also wants to support having users
+specify additional extras without removing the default one. Essentially, they
+would want:
 
 * ``package[minimal]`` to give an installation without any extras
 * ``package`` to install recommended dependencies (in a ``recommended`` extras)
 * ``package[additional]`` to install both recommended and additional dependencies (in an ``additional`` extras)
 
-This could be achieved with e.g::
+This could be achieved with e.g:
 
-    [options]
-    ...
-    default_extras =
-        recommended
+.. code-block:: toml
 
-    [options.extras_require]
-    minimal =
-    recommended =
-        package1
-        package2
-    additional =
-        package[recommended]
-        package3
+    [project]
+    default-optional-dependencies = [
+        "recommended"
+    ]
+
+    [project.optional-dependencies]
+    minimal = []
+    recommended = [
+        "package1",
+        "package2"
+    ]
+    additional = [
+        "package[recommended]",
+        "package3"
+    ]
 
 The ability for a package to reference itself in the extras is supported by
 existing Python packaging tools.
@@ -289,7 +305,7 @@ would only get installed if another extra was not specified. An implementation
 of this was proposed in https://github.com/pypa/setuptools/pull/1503, but it
 was found that there would be no way to make this work without breaking
 compatibility with existing usage. For example, packages using setuptools via
-a setup.py file can do::
+a ``setup.py`` file can do::
 
     setup(
         ...
