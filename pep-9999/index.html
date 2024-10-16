@@ -26,7 +26,7 @@
     <meta name="theme-color" content="#3776ab">
 </head>
 <body>
-
+    
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
   <symbol id="svg-sun-half" viewBox="0 0 24 24" pointer-events="all">
     <title>Following system colour scheme</title>
@@ -231,26 +231,28 @@ providing a way to only install the required dependencies.</p>
 <code class="docutils literal notranslate"><span class="pre">recommended</span></code> containing the recommended but not required dependencies, and
 would choose to have this be included as a default extras. Exactly how this is
 done will depend on the packaging tool, but one could imagine doing something
-as follows in a <code class="docutils literal notranslate"><span class="pre">setup.cfg</span></code> file:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">options</span><span class="p">]</span>
-<span class="o">...</span>
-<span class="n">default_extras</span> <span class="o">=</span>
-    <span class="n">recommended</span>
+as follows in a <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> file:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[project]</span>
+<span class="n">default-optional-dependencies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;recommended&quot;</span>
+<span class="p">]</span>
 
-<span class="p">[</span><span class="n">options</span><span class="o">.</span><span class="n">extras_require</span><span class="p">]</span>
-<span class="n">recommended</span> <span class="o">=</span>
-    <span class="n">package1</span>
-    <span class="n">package2</span>
+<span class="k">[project.optional-dependencies]</span>
+<span class="n">recommended</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;package1&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;package2&quot;</span>
+<span class="p">]</span>
 </pre></div>
 </div>
 <p>In this specific case, a package maintainer may want to allow users to also
 install the package without the recommended dependencies, in which case they
 could define an empty extras:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">options</span><span class="o">.</span><span class="n">extras_require</span><span class="p">]</span>
-<span class="n">minimal</span> <span class="o">=</span>
-<span class="n">recommended</span> <span class="o">=</span>
-    <span class="n">package1</span>
-    <span class="n">package2</span>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[project.optional-dependencies]</span>
+<span class="n">minimal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[]</span>
+<span class="n">recommended</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;package1&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;package2&quot;</span>
+<span class="p">]</span>
 </pre></div>
 </div>
 <p>This would then allow users to install <code class="docutils literal notranslate"><span class="pre">package[minimal]</span></code> which, since
@@ -272,16 +274,19 @@ to support different ones, or a package that can rely on different computational
 backends but needs at least one to be installed.</p>
 <p>In this case, package maintainers could make the choice to define an extra
 for each backend or frontend, and provide a default, e.g.:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">options</span><span class="p">]</span>
-<span class="o">...</span>
-<span class="n">default_extras</span> <span class="o">=</span>
-    <span class="n">backend1</span>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[project]</span>
+<span class="n">default-optional-dependencies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;backend1&quot;</span>
+<span class="p">]</span>
 
-<span class="p">[</span><span class="n">options</span><span class="o">.</span><span class="n">extras_require</span><span class="p">]</span>
-<span class="n">backend1</span> <span class="o">=</span>
-    <span class="o">...</span>
-<span class="n">backend2</span> <span class="o">=</span>
-    <span class="o">...</span>
+<span class="k">[project.optional-dependencies]</span>
+<span class="n">backend1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;package1&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;package2&quot;</span>
+<span class="p">]</span>
+<span class="n">backend2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;package3&quot;</span>
+<span class="p">]</span>
 </pre></div>
 </div>
 <p>Unlike the previous example however, maintainers would not necessarily provide a
@@ -294,27 +299,30 @@ as required dependencies rather than using the default extras mechanism.</p>
 <section id="supporting-minimal-installations-while-not-always-removing-default-extras">
 <h3><a class="toc-backref" href="#supporting-minimal-installations-while-not-always-removing-default-extras" role="doc-backlink">Supporting minimal installations while not always removing default extras</a></h3>
 <p>An additional case we consider here is where a package maintainer wants to support
-minimal installations without any extras, but otherwise does not want default extras
-to always be removed. Essentially, they would want:</p>
+minimal installations without any extras, but also wants to support having users
+specify additional extras without removing the default one. Essentially, they
+would want:</p>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">package[minimal]</span></code> to give an installation without any extras</li>
 <li><code class="docutils literal notranslate"><span class="pre">package</span></code> to install recommended dependencies (in a <code class="docutils literal notranslate"><span class="pre">recommended</span></code> extras)</li>
 <li><code class="docutils literal notranslate"><span class="pre">package[additional]</span></code> to install both recommended and additional dependencies (in an <code class="docutils literal notranslate"><span class="pre">additional</span></code> extras)</li>
 </ul>
 <p>This could be achieved with e.g:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">options</span><span class="p">]</span>
-<span class="o">...</span>
-<span class="n">default_extras</span> <span class="o">=</span>
-    <span class="n">recommended</span>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[project]</span>
+<span class="n">default-optional-dependencies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;recommended&quot;</span>
+<span class="p">]</span>
 
-<span class="p">[</span><span class="n">options</span><span class="o">.</span><span class="n">extras_require</span><span class="p">]</span>
-<span class="n">minimal</span> <span class="o">=</span>
-<span class="n">recommended</span> <span class="o">=</span>
-    <span class="n">package1</span>
-    <span class="n">package2</span>
-<span class="n">additional</span> <span class="o">=</span>
-    <span class="n">package</span><span class="p">[</span><span class="n">recommended</span><span class="p">]</span>
-    <span class="n">package3</span>
+<span class="k">[project.optional-dependencies]</span>
+<span class="n">minimal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[]</span>
+<span class="n">recommended</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;package1&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;package2&quot;</span>
+<span class="p">]</span>
+<span class="n">additional</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;package[recommended]&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;package3&quot;</span>
+<span class="p">]</span>
 </pre></div>
 </div>
 <p>The ability for a package to reference itself in the extras is supported by
@@ -385,7 +393,7 @@ would only get installed if another extra was not specified. An implementation
 of this was proposed in <a class="reference external" href="https://github.com/pypa/setuptools/pull/1503">https://github.com/pypa/setuptools/pull/1503</a>, but it
 was found that there would be no way to make this work without breaking
 compatibility with existing usage. For example, packages using setuptools via
-a setup.py file can do:</p>
+a <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> file can do:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">setup</span><span class="p">(</span>
     <span class="o">...</span>
     <span class="n">extras_require</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;package_a&#39;</span><span class="p">]},</span>
@@ -449,7 +457,7 @@ for example in cases where at least one backend or frontend should be installed.
 </section>
 <hr class="docutils" />
 <p>Source: <a class="reference external" href="https://github.com/python/peps/blob/main/peps/pep-9999.rst">https://github.com/python/peps/blob/main/peps/pep-9999.rst</a></p>
-<p>Last modified: <a class="reference external" href="https://github.com/python/peps/commits/main/peps/pep-9999.rst">2024-10-16 10:13:07 GMT</a></p>
+<p>Last modified: <a class="reference external" href="https://github.com/python/peps/commits/main/peps/pep-9999.rst">2024-10-16 12:59:38 GMT</a></p>
 
         </article>
         <nav id="pep-sidebar">
