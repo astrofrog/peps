@@ -1,5 +1,5 @@
-PEP: TBD
-Title: Default Extras for Python Packages
+PEP: 9999
+Title: Default Extras for Python Software Packages
 Author: Thomas Robitaille <thomas.robitaille@gmail.com>,
         Jonathan Dekhtiar <jonathan@dekhtiar.com>
 Sponsor: TBD
@@ -17,17 +17,13 @@ Abstract
 declaring package dependencies. One feature of this language is the ability to
 specify *extras*, which are optional components of a distribution that, when
 used, install additional dependencies. This PEP proposes a mechanism to allow
-one or more extras to be included or "selected" by default and defines a method
-for these default extras to be "unselected" if desired.
+one or more extras to be installed by default if none are provided explicitly.
 
 Motivation
 ==========
 
-This PEP proposes a method to specify one or more extras to be included by
-default while providing a way for users to remove one or more of these default
-extras. Various use cases and possible solutions in this PEP were discussed
-extensively at
-https://discuss.python.org/t/adding-a-default-extra-require-environment/4898/38.
+Various use cases for default extras and possible solutions in this PEP were discussed
+extensively at https://discuss.python.org/t/adding-a-default-extra-require-environment/4898/38.
 In this section we take a look at two common use cases that provide the
 motivation for the present PEP.
 
@@ -65,23 +61,14 @@ defaults would provide a much better experience for users.
 Specification
 =============
 
-Terminology
------------
-
-When installing a package, selecting optional dependencies (commonly known as
-*extras*) will now be referred to as *selecting* extras. For example, in
-the following command, a user has *selected* the ``recommended`` extra::
-
-    pip install package[recommended]
-
 ``Default-Extra`` Metadata Field
 ---------------------------------
 
 A new metadata field, ``Default-Extra``, will be added to the `core package
 metadata <https://packaging.python.org/en/latest/specifications/core-metadata/#core-metadata>`_.
 This field allows package maintainers to define an extra that is
-automatically selected when a user installs the package without specifying any
-extras::
+automatically included when a user installs the package without specifying any
+extras explicitly::
 
     Default-Extra: recommended
 
@@ -97,26 +84,139 @@ Overriding default extras
 
 The proposal here is simple - if extras are explicitly given in a dependency
 specification, the default extras are not installed. For example, if a package
-defines a ``recommended`` default extra as well as a non-default ``optional``
-extras, then if a user was to install the package with::
+defines a ``extra1`` default extra as well as a non-default ``extra2``
+extra, then if a user was to install the package with::
 
     pip install package
 
-the ``recommended`` dependency would be included. If the user instead uses::
+the ``extra1`` dependency would be included. If the user instead uses::
 
-    pip install package[optional]
+    pip install package[extra2]
 
-then the ``recommended`` extras would not be installed. A minimal installation
-of a package can then be requested with::
+then the ``extra1`` extras would not be installed.
 
-    pip install package[]
+If the same package is specified multiple times in a dependency tree, then if
+any of these were specified without any explicit extras, the default extras
+should be installed even if other occurences of the package in the dependency
+tree have explicitly specified extras.
 
-**To be updated after implementations are tested out**: if it is not
-possible to easily support ``[]`` as meaning explicitly provided no extras,
-another option is that package maintainers wanting to support a minimal
-installation could define an empty extras called e.g. ``nodefault`` (the name
-would be up to the maintainer), and then tell users that to get a minimal
-installation they could use e.g. ``package[nodefault]``
+Note that ``package[]`` would continue to be equivalent to ``package`` and would
+not be provided as a way to install without default extras (see the `Rejected
+Alternatives`_ section for the rationale).
+
+Usage scenarios
+===============
+
+The simple rule above regarding only installing default extras when no extras
+are explicitly specified, combined with the introduction of the
+``Default-Extra:`` keyword allows us to address several different use cases.
+Below we take a look at the two specific use cases raised in the `Motivation`_
+section as well as an additional case.
+
+Recommended dependencies and minimal installations
+--------------------------------------------------
+
+First, we consider the case of packages that want users to get recommended
+but not strictly required dependencies installed by default, while also
+providing a way to only install the required dependencies.
+
+In order to do this, a package maintainer would define an extras called
+``recommended`` containing the recommended but not required dependencies, and
+would choose to have this be included as a default extras. Exactly how this is
+done will depend on the packaging tool, but one could imagine doing something
+as follows in a ``setup.cfg`` file::
+
+    [options]
+    ...
+    default_extras =
+        recommended
+
+    [options.extras_require]
+    recommended =
+        package1
+        package2
+
+In this specific case, a package maintainer may want to allow users to also
+install the package without the recommended dependencies, in which case they
+could define an empty extras::
+
+    [options.extras_require]
+    minimal =
+    recommended =
+        package1
+        package2
+
+This would then allow users to install ``package[minimal]`` which, since
+there would be an extras explicitly specified, would mean the default extras
+does not get installed, and since the ``minimal`` extras is empty, no
+additional dependencies would be installed.
+
+Maintainers would have the choice as to whether to offer the capability to do a
+minimal installation or not - in some cases, such as highlighted in the next
+section, this might not be desirable.
+
+Packages requiring at least one backend or frontend
+---------------------------------------------------
+
+As described in `Motivation`_, some packages may support multiple backends
+and/or frontends, and in some cases it may be desirable to ensure that there
+is always at least one backend or frontend package installed, as the package
+would be unusable otherwise. Concrete examples of this might include a GUI
+application that needs a GUI library to be present to be usable but is able
+to support different ones, or a package that can rely on different computational
+backends but needs at least one to be installed.
+
+In this case, package maintainers could make the choice to define an extra
+for each backend or frontend, and provide a default, e.g.::
+
+    [options]
+    ...
+    default_extras =
+        backend1
+
+    [options.extras_require]
+    backend1 =
+        ...
+    backend2 =
+        ...
+
+Unlike the previous example however, maintainers would not necessarily provide a
+way to do an installation without any extras since it might leave the package in
+an unusable state.
+
+If packages can support e.g. multiple backends at the same time, and some of
+the backends should always be installed, then the dependencies for these should be given
+as required dependencies rather than using the default extras mechanism.
+
+Supporting minimal installations while not always removing default extras
+-------------------------------------------------------------------------
+
+An additional case we consider here is where a package maintainer wants to support
+minimal installations without any extras, but otherwise does not want default extras
+to always be removed. Essentially, they would want:
+
+* ``package[minimal]`` to give an installation without any extras
+* ``package`` to install recommended dependencies (in a ``recommended`` extras)
+* ``package[additional]`` to install both recommended and additional dependencies (in an ``additional`` extras)
+
+This could be achieved with e.g::
+
+    [options]
+    ...
+    default_extras =
+        recommended
+
+    [options.extras_require]
+    minimal =
+    recommended =
+        package1
+        package2
+    additional =
+        package[recommended]
+        package3
+
+The ability for a package to reference itself in the extras is supported by
+existing Python packaging tools.
 
 Backward Compatibility
 ======================
@@ -128,12 +228,13 @@ usage.
 Once packages start defining default extras, those defaults will only be honored
 with recent versions of packaging tools which implement this PEP, but those
 packages will remain fully backward-compatible with older packaging tools - with
-the only difference that the default extras will not be installed.
+the only difference that the default extras will not be installed automatically
+for older packaging tools.
 
 Implementation
 ==============
 
-**To be updated after implementations are tested out**
+*To be updated after implementations are tested out*
 
 Rejected Alternatives
 =====================
@@ -148,12 +249,9 @@ to be explicitly unselected.
 In this picture, a new syntax for unselecting extras would be introduced as an
 extension of the mini-language defined in :pep:`508`. If a package defined
 default extras, users could opt out of these defaults by using a minus sign
-(``-``) before the extra name. The proposed syntax update is as follows::
+(``-``) before the extra name. The proposed syntax update would have been as follows::
 
     extras_list   = (-)?identifier (wsp* ',' wsp* (-)?identifier)*
-
-If both an extra and its negated version appear in an extras list, the
-non-negated extra should take precedence.
 
 Valid examples of this new syntax would have included, e.g.:
 
@@ -169,7 +267,7 @@ However, there are two main issues with this approach:
   tree included both ``package[pdf]`` and ``package[-pdf]``, and the rules would
   not be intuitive to users.
 
-* More importantly, this would introduce new syntax into dependency specification,
+* More critically, this would introduce new syntax into dependency specification,
   which means that if any package defined a dependency using the new syntax, it
   and any other package depending on it would no longer be installable by existing
   packaging tools, so this would be a major backward compatibility break.
@@ -220,8 +318,8 @@ to strings in the package metadata. Having::
 would be indistinguishable from the string 'None' which may already be used as
 an extras name in a Python package. If we were to modify the core metadata
 syntax to allow non-string 'special' extras names, then we would be back to
-modifying the core metadata specification, in which case we might as well
-introduce ``Default-Extra``.
+modifying the core metadata specification, which is no better than
+introducing ``Default-Extra``.
 
 Relying on tooling to deselect any default extras
 -------------------------------------------------
@@ -244,4 +342,17 @@ However, this solution is not ideal because it would not allow packages to
 specify themselves that they do not need some of the default extras of a
 dependency. It would also carry risks for users who might disable all default
 extras in a big dependency tree, potentially breaking packages in the tree that
-rely on default extras at any point.
+rely on default extras at any point. Nevertheless, this PEP does not disallow
+this approach and it is up to the maintainers of different packaging tools to
+decide if they want to support this kind of option.
+
+``package[]`` disables default extras
+-------------------------------------
+
+Another way to specify not to install any extras, including default extras, would
+be to use ``package[]``. However, this would break the current assumption in packaging tools that
+``package[]`` is equivalent to ``package``, and may also result
+in developers overusing ``[]`` by default even when it is not needed. As
+highlighted in `Usage scenarios`_, there may also be cases where package
+maintainers do not actually want to support an installation without any extras,
+for example in cases where at least one backend or frontend should be installed.
