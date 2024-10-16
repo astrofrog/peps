@@ -1,0 +1,494 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <title>PEP 9999 – Default Extras for Python Software Packages | peps.python.org</title>
+    <link rel="shortcut icon" href="_static/py.png">
+    <link rel="canonical" href="https://peps.python.org/pep-9999/">
+    <link rel="stylesheet" href="_static/style.css" type="text/css">
+    <link rel="stylesheet" href="_static/mq.css" type="text/css">
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" media="(prefers-color-scheme: light)" id="pyg-light">
+    <link rel="stylesheet" href="_static/pygments_dark.css" type="text/css" media="(prefers-color-scheme: dark)" id="pyg-dark">
+    <link rel="alternate" type="application/rss+xml" title="Latest PEPs" href="https://peps.python.org/peps.rss">
+    <meta property="og:title" content='PEP 9999 – Default Extras for Python Software Packages | peps.python.org'>
+    <meta property="og:description" content="PEP 508 specifies a mini-language for declaring package dependencies. One feature of this language is the ability to specify extras, which are optional components of a distribution that, when used, install additional dependencies. This PEP proposes a me...">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://peps.python.org/pep-9999/">
+    <meta property="og:site_name" content="Python Enhancement Proposals (PEPs)">
+    <meta property="og:image" content="https://peps.python.org/_static/og-image.png">
+    <meta property="og:image:alt" content="Python PEPs">
+    <meta property="og:image:width" content="200">
+    <meta property="og:image:height" content="200">
+    <meta name="description" content="PEP 508 specifies a mini-language for declaring package dependencies. One feature of this language is the ability to specify extras, which are optional components of a distribution that, when used, install additional dependencies. This PEP proposes a me...">
+    <meta name="theme-color" content="#3776ab">
+</head>
+<body>
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-sun-half" viewBox="0 0 24 24" pointer-events="all">
+    <title>Following system colour scheme</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"></circle>
+      <path d="M12 3v18m0-12l4.65-4.65M12 14.3l7.37-7.37M12 19.6l8.85-8.85"></path>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24" pointer-events="all">
+    <title>Selected dark colour scheme</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"></path>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24" pointer-events="all">
+    <title>Selected light colour scheme</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+</svg>
+    <script>
+
+        document.documentElement.dataset.colour_scheme = localStorage.getItem("colour_scheme") || "auto"
+    </script>
+    <section id="pep-page-section">
+        <header>
+            <h1>Python Enhancement Proposals</h1>
+            <ul class="breadcrumbs">
+                <li><a href="https://www.python.org/" title="The Python Programming Language">Python</a> &raquo; </li>
+                <li><a href="pep-0000.html">PEP Index</a> &raquo; </li>
+                <li>PEP 9999</li>
+            </ul>
+            <button id="colour-scheme-cycler" onClick="setColourScheme(nextColourScheme())">
+                <svg aria-hidden="true" class="colour-scheme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+                <svg aria-hidden="true" class="colour-scheme-icon-when-dark"><use href="#svg-moon"></use></svg>
+                <svg aria-hidden="true" class="colour-scheme-icon-when-light"><use href="#svg-sun"></use></svg>
+                <span class="visually-hidden">Toggle light / dark / auto colour theme</span>
+            </button>
+        </header>
+        <article>
+            <section id="pep-content">
+<h1 class="page-title">PEP 9999 – Default Extras for Python Software Packages</h1>
+<dl class="rfc2822 field-list simple">
+<dt class="field-odd">Author<span class="colon">:</span></dt>
+<dd class="field-odd">Thomas Robitaille &lt;thomas.robitaille&#32;&#97;t&#32;gmail.com&gt;,
+Jonathan Dekhtiar &lt;jonathan&#32;&#97;t&#32;dekhtiar.com&gt;</dd>
+<dt class="field-even">Sponsor<span class="colon">:</span></dt>
+<dd class="field-even">TBD</dd>
+<dt class="field-odd">Status<span class="colon">:</span></dt>
+<dd class="field-odd"><abbr title="Proposal under active discussion and revision">Draft</abbr></dd>
+<dt class="field-even">Type<span class="colon">:</span></dt>
+<dd class="field-even"><abbr title="Normative PEP with a new feature for Python, implementation change for CPython or interoperability standard for the ecosystem">Standards Track</abbr></dd>
+<dt class="field-odd">Topic<span class="colon">:</span></dt>
+<dd class="field-odd"><a class="reference external" href="topic/packaging.html">Packaging</a></dd>
+<dt class="field-even">Created<span class="colon">:</span></dt>
+<dd class="field-even">24-Sep-2024</dd>
+</dl>
+<hr class="docutils" />
+<section id="contents">
+<details><summary>Table of Contents</summary><ul class="simple">
+<li><a class="reference internal" href="#abstract">Abstract</a></li>
+<li><a class="reference internal" href="#motivation">Motivation</a><ul>
+<li><a class="reference internal" href="#recommended-but-not-required-dependencies">Recommended but not required dependencies</a></li>
+<li><a class="reference internal" href="#packages-supporting-multiple-backends-or-frontends">Packages supporting multiple backends or frontends</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#specification">Specification</a><ul>
+<li><a class="reference internal" href="#default-extra-metadata-field"><code class="docutils literal notranslate"><span class="pre">Default-Extra</span></code> Metadata Field</a></li>
+<li><a class="reference internal" href="#overriding-default-extras">Overriding default extras</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#usage-scenarios">Usage scenarios</a><ul>
+<li><a class="reference internal" href="#recommended-dependencies-and-minimal-installations">Recommended dependencies and minimal installations</a></li>
+<li><a class="reference internal" href="#packages-requiring-at-least-one-backend-or-frontend">Packages requiring at least one backend or frontend</a></li>
+<li><a class="reference internal" href="#supporting-minimal-installations-while-not-always-removing-default-extras">Supporting minimal installations while not always removing default extras</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#backward-compatibility">Backward Compatibility</a></li>
+<li><a class="reference internal" href="#implementation">Implementation</a></li>
+<li><a class="reference internal" href="#rejected-alternatives">Rejected Alternatives</a><ul>
+<li><a class="reference internal" href="#syntax-for-unselecting-extras">Syntax for unselecting extras</a></li>
+<li><a class="reference internal" href="#adding-a-special-entry-in-extras-require">Adding a special entry in <code class="docutils literal notranslate"><span class="pre">extras_require</span></code></a></li>
+<li><a class="reference internal" href="#relying-on-tooling-to-deselect-any-default-extras">Relying on tooling to deselect any default extras</a></li>
+<li><a class="reference internal" href="#package-disables-default-extras"><code class="docutils literal notranslate"><span class="pre">package[]</span></code> disables default extras</a></li>
+</ul>
+</li>
+</ul>
+</details></section>
+<section id="abstract">
+<h2><a class="toc-backref" href="#abstract" role="doc-backlink">Abstract</a></h2>
+<p><a class="pep reference internal" href="pep-0508.html" title="PEP 508 – Dependency specification for Python Software Packages">PEP 508</a> specifies a mini-language for
+declaring package dependencies. One feature of this language is the ability to
+specify <em>extras</em>, which are optional components of a distribution that, when
+used, install additional dependencies. This PEP proposes a mechanism to allow
+one or more extras to be installed by default if none are provided explicitly.</p>
+</section>
+<section id="motivation">
+<h2><a class="toc-backref" href="#motivation" role="doc-backlink">Motivation</a></h2>
+<p>Various use cases for default extras and possible solutions in this PEP were discussed
+extensively at <a class="reference external" href="https://discuss.python.org/t/adding-a-default-extra-require-environment/4898/38">https://discuss.python.org/t/adding-a-default-extra-require-environment/4898/38</a>.
+In this section we take a look at two common use cases that provide the
+motivation for the present PEP.</p>
+<section id="recommended-but-not-required-dependencies">
+<h3><a class="toc-backref" href="#recommended-but-not-required-dependencies" role="doc-backlink">Recommended but not required dependencies</a></h3>
+<p>Package maintainers often use extras to declare optional dependencies that
+extend the functionality or performance of a package. In some cases, it can be
+difficult to determine which dependencies should be required and which should be
+categorized as extras. A balance must be struck between the needs of typical
+users (who may prefer most features to be available ‘by default’) and users who
+want minimal installations without large, optional dependencies. One current
+solution is to define an extra called, for example, <code class="docutils literal notranslate"><span class="pre">recommended</span></code>, which
+includes all non-essential but suggested dependencies. Users are then told to
+install the package using <code class="docutils literal notranslate"><span class="pre">package[recommended]</span></code>, while those who prefer more
+control can simply use <code class="docutils literal notranslate"><span class="pre">package</span></code>. However, in practice, many users are unaware
+of the <code class="docutils literal notranslate"><span class="pre">[recommended]</span></code> syntax, placing the burden on them to know this for a
+typical installation. Having a way to have recommended dependencies be installed
+by default while providing a way for users to request a more minimal installation
+would satisfy this use case.</p>
+</section>
+<section id="packages-supporting-multiple-backends-or-frontends">
+<h3><a class="toc-backref" href="#packages-supporting-multiple-backends-or-frontends" role="doc-backlink">Packages supporting multiple backends or frontends</a></h3>
+<p>Another common use case for using extras are to define different backends or
+frontends, and dependencies that need to be installed for each backend or
+frontend. A package might need at least one backend or frontend to be installed
+in order to be functional, but may be flexible on which backend or frontend this
+is. With current packaging standards, maintainers have the choice between either
+making one of the backends or frontends be always required, or requiring users
+to always specify extras, e.g. <code class="docutils literal notranslate"><span class="pre">package[backend]</span></code>. Having a way to specify one
+or more default backend or frontend and providing a way to override these
+defaults would provide a much better experience for users.</p>
+</section>
+</section>
+<section id="specification">
+<h2><a class="toc-backref" href="#specification" role="doc-backlink">Specification</a></h2>
+<section id="default-extra-metadata-field">
+<h3><a class="toc-backref" href="#default-extra-metadata-field" role="doc-backlink"><code class="docutils literal notranslate"><span class="pre">Default-Extra</span></code> Metadata Field</a></h3>
+<p>A new metadata field, <code class="docutils literal notranslate"><span class="pre">Default-Extra</span></code>, will be added to the <a class="reference external" href="https://packaging.python.org/en/latest/specifications/core-metadata/#core-metadata">core package
+metadata</a>.
+This field allows package maintainers to define an extra that is
+automatically included when a user installs the package without specifying any
+extras explicitly:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Default</span><span class="o">-</span><span class="n">Extra</span><span class="p">:</span> <span class="n">recommended</span>
+</pre></div>
+</div>
+<p>If multiple default extras are needed, one <code class="docutils literal notranslate"><span class="pre">Default-Extra:</span></code> entry
+should be provided for each one:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Default</span><span class="o">-</span><span class="n">Extra</span><span class="p">:</span> <span class="n">backend1</span>
+<span class="n">Default</span><span class="o">-</span><span class="n">Extra</span><span class="p">:</span> <span class="n">backend2</span>
+<span class="n">Default</span><span class="o">-</span><span class="n">Extra</span><span class="p">:</span> <span class="n">backend3</span>
+</pre></div>
+</div>
+</section>
+<section id="overriding-default-extras">
+<h3><a class="toc-backref" href="#overriding-default-extras" role="doc-backlink">Overriding default extras</a></h3>
+<p>The proposal here is simple - if extras are explicitly given in a dependency
+specification, the default extras are not installed. For example, if a package
+defines a <code class="docutils literal notranslate"><span class="pre">extra1</span></code> default extra as well as a non-default <code class="docutils literal notranslate"><span class="pre">extra2</span></code>
+extra, then if a user was to install the package with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">package</span>
+</pre></div>
+</div>
+<p>the <code class="docutils literal notranslate"><span class="pre">extra1</span></code> dependency would be included. If the user instead uses:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">package</span><span class="p">[</span><span class="n">extra2</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>then the <code class="docutils literal notranslate"><span class="pre">extra1</span></code> extras would not be installed.</p>
+<p>If the same package is specified multiple times in a dependency tree, then if
+any of these were specified without any explicit extras, the default extras
+should be installed even if other occurences of the package in the dependency
+tree have explicitly specified extras.</p>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">package[]</span></code> would continue to be equivalent to <code class="docutils literal notranslate"><span class="pre">package</span></code> and would
+not be provided as a way to install without default extras (see the <a class="reference internal" href="#rejected-alternatives">Rejected
+Alternatives</a> section for the rationale).</p>
+</section>
+</section>
+<section id="usage-scenarios">
+<h2><a class="toc-backref" href="#usage-scenarios" role="doc-backlink">Usage scenarios</a></h2>
+<p>The simple rule above regarding only installing default extras when no extras
+are explicitly specified, combined with the introduction of the
+<code class="docutils literal notranslate"><span class="pre">Default-Extra:</span></code> keyword allows us to address several different use cases.
+Below we take a look at the two specific use cases raised in the <a class="reference internal" href="#motivation">Motivation</a>
+section as well as an additional case.</p>
+<section id="recommended-dependencies-and-minimal-installations">
+<h3><a class="toc-backref" href="#recommended-dependencies-and-minimal-installations" role="doc-backlink">Recommended dependencies and minimal installations</a></h3>
+<p>First, we consider the case of packages that want users to get recommended
+but not strictly required dependencies installed by default, while also
+providing a way to only install the required dependencies.</p>
+<p>In order to do this, a package maintainer would define an extras called
+<code class="docutils literal notranslate"><span class="pre">recommended</span></code> containing the recommended but not required dependencies, and
+would choose to have this be included as a default extras. Exactly how this is
+done will depend on the packaging tool, but one could imagine doing something
+as follows in a <code class="docutils literal notranslate"><span class="pre">setup.cfg</span></code> file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">options</span><span class="p">]</span>
+<span class="o">...</span>
+<span class="n">default_extras</span> <span class="o">=</span>
+    <span class="n">recommended</span>
+
+<span class="p">[</span><span class="n">options</span><span class="o">.</span><span class="n">extras_require</span><span class="p">]</span>
+<span class="n">recommended</span> <span class="o">=</span>
+    <span class="n">package1</span>
+    <span class="n">package2</span>
+</pre></div>
+</div>
+<p>In this specific case, a package maintainer may want to allow users to also
+install the package without the recommended dependencies, in which case they
+could define an empty extras:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">options</span><span class="o">.</span><span class="n">extras_require</span><span class="p">]</span>
+<span class="n">minimal</span> <span class="o">=</span>
+<span class="n">recommended</span> <span class="o">=</span>
+    <span class="n">package1</span>
+    <span class="n">package2</span>
+</pre></div>
+</div>
+<p>This would then allow users to install <code class="docutils literal notranslate"><span class="pre">package[minimal]</span></code> which, since
+there would be an extras explicitly specified, would mean the default extras
+does not get installed, and since the <code class="docutils literal notranslate"><span class="pre">minimal</span></code> extras is empty, no
+additional dependencies would be installed.</p>
+<p>Maintainers would have the choice as to whether to offer the capability to do a
+minimal installation or not - in some cases, such as highlighted in the next
+section, this might not be desirable.</p>
+</section>
+<section id="packages-requiring-at-least-one-backend-or-frontend">
+<h3><a class="toc-backref" href="#packages-requiring-at-least-one-backend-or-frontend" role="doc-backlink">Packages requiring at least one backend or frontend</a></h3>
+<p>As described in <a class="reference internal" href="#motivation">Motivation</a>, some packages may support multiple backends
+and/or frontends, and in some cases it may be desirable to ensure that there
+is always at least one backend or frontend package installed, as the package
+would be unusable otherwise. Concrete examples of this might include a GUI
+application that needs a GUI library to be present to be usable but is able
+to support different ones, or a package that can rely on different computational
+backends but needs at least one to be installed.</p>
+<p>In this case, package maintainers could make the choice to define an extra
+for each backend or frontend, and provide a default, e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">options</span><span class="p">]</span>
+<span class="o">...</span>
+<span class="n">default_extras</span> <span class="o">=</span>
+    <span class="n">backend1</span>
+
+<span class="p">[</span><span class="n">options</span><span class="o">.</span><span class="n">extras_require</span><span class="p">]</span>
+<span class="n">backend1</span> <span class="o">=</span>
+    <span class="o">...</span>
+<span class="n">backend2</span> <span class="o">=</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>Unlike the previous example however, maintainers would not necessarily provide a
+way to do an installation without any extras since it might leave the package in
+an unusable state.</p>
+<p>If packages can support e.g. multiple backends at the same time, and some of
+the backends should always be installed, then the dependencies for these should be given
+as required dependencies rather than using the default extras mechanism.</p>
+</section>
+<section id="supporting-minimal-installations-while-not-always-removing-default-extras">
+<h3><a class="toc-backref" href="#supporting-minimal-installations-while-not-always-removing-default-extras" role="doc-backlink">Supporting minimal installations while not always removing default extras</a></h3>
+<p>An additional case we consider here is where a package maintainer wants to support
+minimal installations without any extras, but otherwise does not want default extras
+to always be removed. Essentially, they would want:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">package[minimal]</span></code> to give an installation without any extras</li>
+<li><code class="docutils literal notranslate"><span class="pre">package</span></code> to install recommended dependencies (in a <code class="docutils literal notranslate"><span class="pre">recommended</span></code> extras)</li>
+<li><code class="docutils literal notranslate"><span class="pre">package[additional]</span></code> to install both recommended and additional dependencies (in an <code class="docutils literal notranslate"><span class="pre">additional</span></code> extras)</li>
+</ul>
+<p>This could be achieved with e.g:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">options</span><span class="p">]</span>
+<span class="o">...</span>
+<span class="n">default_extras</span> <span class="o">=</span>
+    <span class="n">recommended</span>
+
+<span class="p">[</span><span class="n">options</span><span class="o">.</span><span class="n">extras_require</span><span class="p">]</span>
+<span class="n">minimal</span> <span class="o">=</span>
+<span class="n">recommended</span> <span class="o">=</span>
+    <span class="n">package1</span>
+    <span class="n">package2</span>
+<span class="n">additional</span> <span class="o">=</span>
+    <span class="n">package</span><span class="p">[</span><span class="n">recommended</span><span class="p">]</span>
+    <span class="n">package3</span>
+</pre></div>
+</div>
+<p>The ability for a package to reference itself in the extras is supported by
+existing Python packaging tools.</p>
+</section>
+</section>
+<section id="backward-compatibility">
+<h2><a class="toc-backref" href="#backward-compatibility" role="doc-backlink">Backward Compatibility</a></h2>
+<p>All package specification cases valid under <a class="pep reference internal" href="pep-0508.html" title="PEP 508 – Dependency specification for Python Software Packages">PEP 508</a> will remain valid.
+Therefore, this proposal is fully backward-compatible with existing <a class="pep reference internal" href="pep-0508.html" title="PEP 508 – Dependency specification for Python Software Packages">PEP 508</a>
+usage.</p>
+<p>Once packages start defining default extras, those defaults will only be honored
+with recent versions of packaging tools which implement this PEP, but those
+packages will remain fully backward-compatible with older packaging tools - with
+the only difference that the default extras will not be installed automatically
+for older packaging tools.</p>
+</section>
+<section id="implementation">
+<h2><a class="toc-backref" href="#implementation" role="doc-backlink">Implementation</a></h2>
+<p><em>To be updated after implementations are tested out</em></p>
+</section>
+<section id="rejected-alternatives">
+<h2><a class="toc-backref" href="#rejected-alternatives" role="doc-backlink">Rejected Alternatives</a></h2>
+<section id="syntax-for-unselecting-extras">
+<h3><a class="toc-backref" href="#syntax-for-unselecting-extras" role="doc-backlink">Syntax for unselecting extras</a></h3>
+<p>One of the main competing approaches was as follows: instead of having defaults
+be unselected if any extras were explicitly provided, default extras would need
+to be explicitly unselected.</p>
+<p>In this picture, a new syntax for unselecting extras would be introduced as an
+extension of the mini-language defined in <a class="pep reference internal" href="pep-0508.html" title="PEP 508 – Dependency specification for Python Software Packages">PEP 508</a>. If a package defined
+default extras, users could opt out of these defaults by using a minus sign
+(<code class="docutils literal notranslate"><span class="pre">-</span></code>) before the extra name. The proposed syntax update would have been as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>extras_list   = (-)?identifier (wsp* &#39;,&#39; wsp* (-)?identifier)*
+</pre></div>
+</div>
+<p>Valid examples of this new syntax would have included, e.g.:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">package[-recommended]</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">package[-backend1,</span> <span class="pre">backend2]</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">package[pdf,</span> <span class="pre">-svg]</span></code></li>
+</ul>
+<p>However, there are two main issues with this approach:</p>
+<ul class="simple">
+<li>One would need to define a number of rules for how to interpret corner cases
+such as if an extras and its negated version were both present in the same
+dependency specification (e.g. <code class="docutils literal notranslate"><span class="pre">package[pdf,</span> <span class="pre">-pdf]</span></code>) or if a dependency
+tree included both <code class="docutils literal notranslate"><span class="pre">package[pdf]</span></code> and <code class="docutils literal notranslate"><span class="pre">package[-pdf]</span></code>, and the rules would
+not be intuitive to users.</li>
+<li>More critically, this would introduce new syntax into dependency specification,
+which means that if any package defined a dependency using the new syntax, it
+and any other package depending on it would no longer be installable by existing
+packaging tools, so this would be a major backward compatibility break.</li>
+</ul>
+<p>For these reasons, this alternative was not included in the final proposal.</p>
+</section>
+<section id="adding-a-special-entry-in-extras-require">
+<h3><a class="toc-backref" href="#adding-a-special-entry-in-extras-require" role="doc-backlink">Adding a special entry in <code class="docutils literal notranslate"><span class="pre">extras_require</span></code></a></h3>
+<p>A potential solution that has been explored as an alternative to introducing the
+new <code class="docutils literal notranslate"><span class="pre">Default-Extra</span></code> metadata field would be to make use of an extra with a
+‘special’ name.</p>
+<p>One example would be to use an empty string:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Provides</span><span class="o">-</span><span class="n">Extra</span><span class="p">:</span>
+<span class="n">Requires</span><span class="o">-</span><span class="n">Dist</span><span class="p">:</span> <span class="n">numpy</span> <span class="p">;</span> <span class="n">extra</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span>
+</pre></div>
+</div>
+<p>The idea would be that dependencies installed as part of the ‘empty’ extras
+would only get installed if another extra was not specified. An implementation
+of this was proposed in <a class="reference external" href="https://github.com/pypa/setuptools/pull/1503">https://github.com/pypa/setuptools/pull/1503</a>, but it
+was found that there would be no way to make this work without breaking
+compatibility with existing usage. For example, packages using setuptools via
+a setup.py file can do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">setup</span><span class="p">(</span>
+    <span class="o">...</span>
+    <span class="n">extras_require</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;package_a&#39;</span><span class="p">]},</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>which is valid and equivalent to having <code class="docutils literal notranslate"><span class="pre">package_a</span></code> being defined in
+<code class="docutils literal notranslate"><span class="pre">install_requires</span></code>, so changing the meaning of the empty string requires would
+break compatibility.</p>
+<p>In addition, no other string can be used as a special string since all strings
+that would be a backward-compatible valid extras name may already be used in
+existing packages.</p>
+<p>There have been suggestions of using the special <code class="docutils literal notranslate"><span class="pre">None</span></code> Python variable, but
+again this is not possible, because even though one can use <code class="docutils literal notranslate"><span class="pre">None</span></code> in a <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> file,
+this is not possible in declarative files such as <code class="docutils literal notranslate"><span class="pre">setup.cfg</span></code> or
+<code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>, and furthermore ultimately extras names have to be converted
+to strings in the package metadata. Having:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Provides</span><span class="o">-</span><span class="n">Extra</span><span class="p">:</span> <span class="kc">None</span>
+</pre></div>
+</div>
+<p>would be indistinguishable from the string ‘None’ which may already be used as
+an extras name in a Python package. If we were to modify the core metadata
+syntax to allow non-string ‘special’ extras names, then we would be back to
+modifying the core metadata specification, which is no better than
+introducing <code class="docutils literal notranslate"><span class="pre">Default-Extra</span></code>.</p>
+</section>
+<section id="relying-on-tooling-to-deselect-any-default-extras">
+<h3><a class="toc-backref" href="#relying-on-tooling-to-deselect-any-default-extras" role="doc-backlink">Relying on tooling to deselect any default extras</a></h3>
+<p>Another option to unselect extras would be to implement this at the
+level of packaging tools. For instance, pip could include an option such as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">package</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">default</span><span class="o">-</span><span class="n">extras</span>
+</pre></div>
+</div>
+<p>This option could apply to all or specific packages, similar to
+the <code class="docutils literal notranslate"><span class="pre">--no-binary</span></code> option, e.g.,:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">package</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">default</span><span class="o">-</span><span class="n">extras</span> <span class="p">:</span><span class="nb">all</span><span class="p">:</span>
+</pre></div>
+</div>
+<p>The advantage of this approach is that tools supporting default extras could
+also support unselecting them. This approach would be similar to the <code class="docutils literal notranslate"><span class="pre">--no-install-recommends</span></code>
+option for the <code class="docutils literal notranslate"><span class="pre">apt</span></code> tool.</p>
+<p>However, this solution is not ideal because it would not allow packages to
+specify themselves that they do not need some of the default extras of a
+dependency. It would also carry risks for users who might disable all default
+extras in a big dependency tree, potentially breaking packages in the tree that
+rely on default extras at any point. Nevertheless, this PEP does not disallow
+this approach and it is up to the maintainers of different packaging tools to
+decide if they want to support this kind of option.</p>
+</section>
+<section id="package-disables-default-extras">
+<h3><a class="toc-backref" href="#package-disables-default-extras" role="doc-backlink"><code class="docutils literal notranslate"><span class="pre">package[]</span></code> disables default extras</a></h3>
+<p>Another way to specify not to install any extras, including default extras, would
+be to use <code class="docutils literal notranslate"><span class="pre">package[]</span></code>. However, this would break the current assumption in packaging tools that
+<code class="docutils literal notranslate"><span class="pre">package[]</span></code> is equivalent to <code class="docutils literal notranslate"><span class="pre">package</span></code>, and may also result
+in developers overusing <code class="docutils literal notranslate"><span class="pre">[]</span></code> by default even when it is not needed. As
+highlighted in <a class="reference internal" href="#usage-scenarios">Usage scenarios</a>, there may also be cases where package
+maintainers do not actually want to support an installation without any extras,
+for example in cases where at least one backend or frontend should be installed.</p>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<p>Source: <a class="reference external" href="https://github.com/python/peps/blob/main/peps/pep-9999.rst">https://github.com/python/peps/blob/main/peps/pep-9999.rst</a></p>
+<p>Last modified: <a class="reference external" href="https://github.com/python/peps/commits/main/peps/pep-9999.rst">2024-10-16 10:13:07 GMT</a></p>
+
+        </article>
+        <nav id="pep-sidebar">
+            <h2>Contents</h2>
+            <ul>
+<li><a class="reference internal" href="#abstract">Abstract</a></li>
+<li><a class="reference internal" href="#motivation">Motivation</a><ul>
+<li><a class="reference internal" href="#recommended-but-not-required-dependencies">Recommended but not required dependencies</a></li>
+<li><a class="reference internal" href="#packages-supporting-multiple-backends-or-frontends">Packages supporting multiple backends or frontends</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#specification">Specification</a><ul>
+<li><a class="reference internal" href="#default-extra-metadata-field"><code class="docutils literal notranslate"><span class="pre">Default-Extra</span></code> Metadata Field</a></li>
+<li><a class="reference internal" href="#overriding-default-extras">Overriding default extras</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#usage-scenarios">Usage scenarios</a><ul>
+<li><a class="reference internal" href="#recommended-dependencies-and-minimal-installations">Recommended dependencies and minimal installations</a></li>
+<li><a class="reference internal" href="#packages-requiring-at-least-one-backend-or-frontend">Packages requiring at least one backend or frontend</a></li>
+<li><a class="reference internal" href="#supporting-minimal-installations-while-not-always-removing-default-extras">Supporting minimal installations while not always removing default extras</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#backward-compatibility">Backward Compatibility</a></li>
+<li><a class="reference internal" href="#implementation">Implementation</a></li>
+<li><a class="reference internal" href="#rejected-alternatives">Rejected Alternatives</a><ul>
+<li><a class="reference internal" href="#syntax-for-unselecting-extras">Syntax for unselecting extras</a></li>
+<li><a class="reference internal" href="#adding-a-special-entry-in-extras-require">Adding a special entry in <code class="docutils literal notranslate"><span class="pre">extras_require</span></code></a></li>
+<li><a class="reference internal" href="#relying-on-tooling-to-deselect-any-default-extras">Relying on tooling to deselect any default extras</a></li>
+<li><a class="reference internal" href="#package-disables-default-extras"><code class="docutils literal notranslate"><span class="pre">package[]</span></code> disables default extras</a></li>
+</ul>
+</li>
+</ul>
+
+            <br>
+            <a id="source" href="https://github.com/python/peps/blob/main/peps/pep-9999.rst">Page Source (GitHub)</a>
+        </nav>
+    </section>
+    <script src="_static/colour_scheme.js"></script>
+    <script src="_static/wrap_tables.js"></script>
+    <script src="_static/sticky_banner.js"></script>
+</body>
+</html>
