@@ -21,7 +21,7 @@ Motivation
 ==========
 
 Various use cases for default extras and possible solutions in this PEP were discussed
-extensively at https://discuss.python.org/t/adding-a-default-extra-require-environment/4898/38.
+extensively on `this DPO thread <https://discuss.python.org/t/adding-a-default-extra-require-environment/4898/38>`__.
 In this section we take a look at two common use cases that provide the
 motivation for the present PEP.
 
@@ -95,7 +95,7 @@ then the ``extra1`` extras would not be installed.
 
 If the same package is specified multiple times in a dependency tree, then if
 any of these were specified without any explicit extras, the default extras
-should be installed even if other occurences of the package in the dependency
+should be installed even if other occurrences of the package in the dependency
 tree have explicitly specified extras.
 
 Note that ``package[]`` would continue to be equivalent to ``package`` and would
