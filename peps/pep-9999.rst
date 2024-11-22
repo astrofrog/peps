@@ -1,7 +1,6 @@
 PEP: 9999
 Title: Default Extras for Python Software Packages
-Author: Thomas Robitaille <thomas.robitaille@gmail.com>,
-        Jonathan Dekhtiar <jonathan@dekhtiar.com>
+Author: Thomas Robitaille <thomas.robitaille@gmail.com>, Jonathan Dekhtiar <jonathan@dekhtiar.com>
 Sponsor: TBD
 Status: Draft
 Type: Standards Track
@@ -33,15 +32,16 @@ extend the functionality or performance of a package. In some cases, it can be
 difficult to determine which dependencies should be required and which should be
 categorized as extras. A balance must be struck between the needs of typical
 users (who may prefer most features to be available 'by default') and users who
-want minimal installations without large, optional dependencies. One current
-solution is to define an extra called, for example, ``recommended``, which
+want minimal installations without large, optional dependencies. One solution
+with existing Python packaging infrastructure is for package maintainers to
+define an extra called, for example, ``recommended``, which
 includes all non-essential but suggested dependencies. Users are then told to
 install the package using ``package[recommended]``, while those who prefer more
 control can simply use ``package``. However, in practice, many users are unaware
 of the ``[recommended]`` syntax, placing the burden on them to know this for a
 typical installation. Having a way to have recommended dependencies be installed
 by default while providing a way for users to request a more minimal installation
-would satisfy this use case.
+would satisfy this use case. The present PEP will describe a solution for this use case.
 
 Packages supporting multiple backends or frontends
 --------------------------------------------------
@@ -50,11 +50,40 @@ Another common use case for using extras are to define different backends or
 frontends, and dependencies that need to be installed for each backend or
 frontend. A package might need at least one backend or frontend to be installed
 in order to be functional, but may be flexible on which backend or frontend this
-is. With current packaging standards, maintainers have the choice between either
+is. Concrete examples of such frontends or backends include:
+
+* The Qt frontend library, which requires either PySide or PyQt to be installed
+* BLAS/LAPACK, which have different possible implementations (e.g. OpenBLAS, and MKL)
+* FFT libraries, which also have different implementations (e.g. ``scipy.fft`` and pyFFTW)
+
+With current packaging standards, maintainers have the choice between either
 making one of the backends or frontends be always required, or requiring users
-to always specify extras, e.g. ``package[backend]``. Having a way to specify one
-or more default backend or frontend and providing a way to override these
-defaults would provide a much better experience for users.
+to always specify extras, e.g. ``package[backend]`` and therefore risking having
+users have an unusable installation if they simply install ``package``. Having a
+way to specify one or more default backend or frontend and providing a way to
+override these defaults would provide a much better experience for users, and
+the approach described in this PEP will allow this.
+
+Note that this PEP does not aim to address the issue of disallowing conflicting
+or incompatible extras - for example if a package requires exactly one frontend
+or backend package. There is currently no mechanism in Python packaging
+infrastructure to disallow conflicting or incompatible extras to be installed,
+and this PEP does not change this.
+
+Rationale
+=========
+
+A number of possible solutions have been extensively and vigorously discussed by
+the community for several years, including in `this DPO thread
+<https://discuss.python.org/t/adding-a-default-extra-require-environment/4898/38>`__
+as well as in numerous issues and pull requests. The solution that will be
+presented below may not be everyone's preferred approach from a philosophical
+point of view, however it appears to be the best compromise as it is the only
+solution to a very real problem that would not break backward-compatibility of
+packaging infrastructure in any significant way. It is an opt-in solution which
+means that package maintainers can choose whether or not to use it, and it is
+flexible enough to accommodate both of the major use cases described in
+`Motivation`_.
 
 Specification
 =============
@@ -76,6 +105,43 @@ should be provided for each one::
     Default-Extra: backend1
     Default-Extra: backend2
     Default-Extra: backend3
+
+New key in ``[project]`` metadata table
+---------------------------------------
+
+A new key will be added to the ``[project]`` table in project metadata as
+originally defined in :pep:`621` and now defined in the `PyPA specifications
+<https://packaging.python.org/en/latest/specifications/>`_. This key will be named
+``default-optional-depencencies`` with the following description:
+
+* `TOML <https://toml.io/>`_ type: Array of strings
+* Corresponding core metadata field: ``Default-Extra``
+
+Each string in ``default-optional-depencencies`` should be the name of an extra
+defined in `optional-dependencies
+<https://packaging.python.org/en/latest/specifications/pyproject-toml/#dependencies-optional-dependencies>`_,
+and each extra in this array will be converted to a matching ``Default-Extra``
+entry in the core package metadata. Examples of valid usage which would
+produce the example ``Default-Extra`` entries presented in the previous section are:
+
+.. code-block:: toml
+
+    [project]
+    default-optional-dependencies = [
+        "recommended"
+    ]
+
+and:
+
+.. code-block:: toml
+
+    [project]
+    default-optional-dependencies = [
+        "backend1",
+        "backend2",
+        "backend3"
+    ]
+
 
 Overriding default extras
 -------------------------
@@ -100,16 +166,60 @@ tree have explicitly specified extras.
 
 Note that ``package[]`` would continue to be equivalent to ``package`` and would
 not be provided as a way to install without default extras (see the `Rejected
-Alternatives`_ section for the rationale).
+Ideas`_ section for the rationale).
 
-Usage scenarios
-===============
+Installing without default extras
+---------------------------------
+
+In some cases, package maintainers may want to facilitate installing packages
+without any default extras. In this case, as will be shown in more detail in
+`How to teach this`_, the best approach is to define an extras which could be
+called e.g. ``minimal`` or ``nodefault`` (the naming would be up to the package
+maintainer) which would be an empty set of dependencies. If this extras is
+specified, no default extras will be included, so that e.g. ``package[minimal]``
+would include only required dependencies and no extras. Note that this requires
+no additional specification and is a natural consequence of the rule described
+in `Overriding default extras`_.
+
+There are however valid use cases where package maintainers may not want to
+provide this. For example, in the case of the multiple possible frontends or
+backends, it may be that the package would not be functional without any of the
+options. To take a specific example, a package may need either PyQt or PySide to
+be installed but will not work if none are provided, so a package maintainer may
+therefore not want to provide an option to install the package without any
+extras.
+
+Backward Compatibility
+======================
+
+All package specification cases valid under :pep:`508` will remain valid.
+Therefore, this proposal is fully backward-compatible with existing :pep:`508`
+usage.
+
+Once packages start defining default extras, those defaults will only be honored
+with recent versions of packaging tools which implement this PEP, but those
+packages will remain fully backward-compatible with older packaging tools - with
+the only difference that the default extras will not be installed automatically
+for older packaging tools.
+
+The only conceptual backward-compatibility issue to consider is the fact that
+this PEP changes extras to no longer be strictly additive, in that specifying
+an extra such as ``minimal`` could result in fewer packages being installed.
+
+Security Implications
+=====================
+
+There are no known security implications for this PEP.
+
+How to teach this
+=================
 
 The simple rule above regarding only installing default extras when no extras
 are explicitly specified, combined with the introduction of the
-``Default-Extra:`` keyword allows us to address several different use cases.
-Below we take a look at the two specific use cases raised in the `Motivation`_
-section as well as an additional case.
+``Default-Extra:`` keyword and ``default-optional-dependencies`` metadata key
+allows us to address several different use cases. Below we take a look at the
+two specific use cases raised in the `Motivation`_ section and how package
+maintainers should be taught to address these.
 
 Recommended dependencies and minimal installations
 --------------------------------------------------
@@ -120,9 +230,7 @@ providing a way to only install the required dependencies.
 
 In order to do this, a package maintainer would define an extras called
 ``recommended`` containing the recommended but not required dependencies, and
-would choose to have this be included as a default extras. Exactly how this is
-done will depend on the packaging tool, but one could imagine doing something
-as follows in a ``pyproject.toml`` file:
+would choose to have this be included as a default extras:
 
 .. code-block:: toml
 
@@ -232,26 +340,19 @@ This could be achieved with e.g:
 The ability for a package to reference itself in the extras is supported by
 existing Python packaging tools.
 
-Backward Compatibility
-======================
+Teaching to package users
+-------------------------
 
-All package specification cases valid under :pep:`508` will remain valid.
-Therefore, this proposal is fully backward-compatible with existing :pep:`508`
-usage.
+Packages making use of any of the approaches above should ensure that they
+properly document the options available to users in terms of installation.
 
-Once packages start defining default extras, those defaults will only be honored
-with recent versions of packaging tools which implement this PEP, but those
-packages will remain fully backward-compatible with older packaging tools - with
-the only difference that the default extras will not be installed automatically
-for older packaging tools.
-
-Implementation
-==============
+Reference Implementation
+========================
 
 *To be updated after implementations are tested out*
 
-Rejected Alternatives
-=====================
+Rejected Ideas
+==============
 
 Syntax for unselecting extras
 -----------------------------
@@ -367,6 +468,12 @@ Another way to specify not to install any extras, including default extras, woul
 be to use ``package[]``. However, this would break the current assumption in packaging tools that
 ``package[]`` is equivalent to ``package``, and may also result
 in developers overusing ``[]`` by default even when it is not needed. As
-highlighted in `Usage scenarios`_, there may also be cases where package
+highlighted in `How to teach this`_, there may also be cases where package
 maintainers do not actually want to support an installation without any extras,
 for example in cases where at least one backend or frontend should be installed.
+
+Copyright
+=========
+
+This document is placed in the public domain or under the
+CC0-1.0-Universal license, whichever is more permissive.
