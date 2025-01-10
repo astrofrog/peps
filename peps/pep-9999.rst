@@ -420,9 +420,9 @@ which is valid and equivalent to having ``package_a`` being defined in
 ``install_requires``, so changing the meaning of the empty string requires would
 break compatibility.
 
-In addition, no other string can be used as a special string since all strings
-that would be a backward-compatible valid extras name may already be used in
-existing packages.
+In addition, no other string (such as ``'default'``) can be used as a special
+string since all strings that would be a backward-compatible valid extras name
+may already be used in existing packages.
 
 There have been suggestions of using the special ``None`` Python variable, but
 again this is not possible, because even though one can use ``None`` in a ``setup.py`` file,
