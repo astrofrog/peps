@@ -35,9 +35,9 @@ users (who may prefer most features to be available 'by default') and users who
 want minimal installations without large, optional dependencies. One solution
 with existing Python packaging infrastructure is for package maintainers to
 define an extra called, for example, ``recommended``, which
-includes all non-essential but suggested dependencies. Users are then told to
+includes all non-essential but suggested dependencies. Users are then instructed to
 install the package using ``package[recommended]``, while those who prefer more
-control can simply use ``package``. However, in practice, many users are unaware
+control can use ``package``. However, in practice, many users are unaware
 of the ``[recommended]`` syntax, placing the burden on them to know this for a
 typical installation. Having a way to have recommended dependencies be installed
 by default while providing a way for users to request a more minimal installation
@@ -59,7 +59,7 @@ is. Concrete examples of such frontends or backends include:
 With current packaging standards, maintainers have to either
 require one of the backends or frontends, or require users
 to always specify extras, e.g. ``package[backend]`` and therefore risk users
-having an unusable installation if they simply install ``package``. Having a
+having an unusable installation if they only install ``package``. Having a
 way to specify one or more default backend or frontend and providing a way to
 override these defaults would provide a much better experience for users, and
 the approach described in this PEP will allow this.
@@ -146,7 +146,8 @@ and:
 Overriding default extras
 -------------------------
 
-If extras are explicitly given in a dependency specification, the default extras are not installed. Otherwise, the default extras are used.
+If extras are explicitly given in a dependency specification, the default
+extras are not installed. Otherwise, the default extras are used.
 
 For example, if a package
 defines a ``extra1`` default extra as well as a non-default ``extra2``
@@ -215,7 +216,7 @@ There are no known security implications for this PEP.
 How to teach this
 =================
 
-The simple rule above regarding only installing default extras when no extras
+The rule above regarding only installing default extras when no extras
 are explicitly specified, combined with the introduction of the
 ``Default-Extra:`` keyword and ``default-optional-dependencies`` metadata key
 allows us to address several different use cases. Below we take a look at the
