@@ -46,8 +46,8 @@ would satisfy this use case. The present PEP will describe a solution for this u
 Packages supporting multiple backends or frontends
 --------------------------------------------------
 
-Another common use case for using extras are to define different backends or
-frontends, and dependencies that need to be installed for each backend or
+Another common use case for using extras is to define different backends or
+frontends and dependencies that need to be installed for each backend or
 frontend. A package might need at least one backend or frontend to be installed
 in order to be functional, but may be flexible on which backend or frontend this
 is. Concrete examples of such frontends or backends include:
@@ -56,10 +56,10 @@ is. Concrete examples of such frontends or backends include:
 * BLAS/LAPACK, which have different possible implementations (e.g. OpenBLAS, and MKL)
 * FFT libraries, which also have different implementations (e.g. ``scipy.fft`` and pyFFTW)
 
-With current packaging standards, maintainers have the choice between either
-making one of the backends or frontends be always required, or requiring users
-to always specify extras, e.g. ``package[backend]`` and therefore risking having
-users have an unusable installation if they simply install ``package``. Having a
+With current packaging standards, maintainers have to either
+require one of the backends or frontends, or require users
+to always specify extras, e.g. ``package[backend]`` and therefore risk users
+having an unusable installation if they simply install ``package``. Having a
 way to specify one or more default backend or frontend and providing a way to
 override these defaults would provide a much better experience for users, and
 the approach described in this PEP will allow this.
@@ -68,7 +68,7 @@ Note that this PEP does not aim to address the issue of disallowing conflicting
 or incompatible extras - for example if a package requires exactly one frontend
 or backend package. There is currently no mechanism in Python packaging
 infrastructure to disallow conflicting or incompatible extras to be installed,
-and this PEP does not change this.
+and this PEP does not change that.
 
 Rationale
 =========
@@ -112,12 +112,12 @@ New key in ``[project]`` metadata table
 A new key will be added to the ``[project]`` table in project metadata as
 originally defined in :pep:`621` and now defined in the `PyPA specifications
 <https://packaging.python.org/en/latest/specifications/>`_. This key will be named
-``default-optional-depencencies`` with the following description:
+``default-optional-dependencies`` with the following description:
 
 * `TOML <https://toml.io/>`_ type: Array of strings
 * Corresponding core metadata field: ``Default-Extra``
 
-Each string in ``default-optional-depencencies`` should be the name of an extra
+Each string in ``default-optional-dependencies`` should be the name of an extra
 defined in `optional-dependencies
 <https://packaging.python.org/en/latest/specifications/pyproject-toml/#dependencies-optional-dependencies>`_,
 and each extra in this array will be converted to a matching ``Default-Extra``
@@ -224,7 +224,7 @@ maintainers should be taught to address these.
 Recommended dependencies and minimal installations
 --------------------------------------------------
 
-First, we consider the case of packages that want users to get recommended
+First, we consider the case of packages that want recommended
 but not strictly required dependencies installed by default, while also
 providing a way to only install the required dependencies.
 
@@ -259,7 +259,7 @@ could define an empty extras:
     ]
 
 This would then allow users to install ``package[minimal]`` which, since
-there would be an extras explicitly specified, would mean the default extras
+there would be an extra explicitly specified, would mean the default extras
 does not get installed, and since the ``minimal`` extras is empty, no
 additional dependencies would be installed.
 
