@@ -1,7 +1,7 @@
 PEP: 9999
 Title: Default Extras for Python Software Packages
 Author: Thomas Robitaille <thomas.robitaille@gmail.com>, Jonathan Dekhtiar <jonathan@dekhtiar.com>
-Sponsor: TBD
+Sponsor: Pradyun Gedam <pradyunsg@gmail.com>
 Status: Draft
 Type: Standards Track
 Topic: Packaging
@@ -146,8 +146,9 @@ and:
 Overriding default extras
 -------------------------
 
-The proposal here is simple - if extras are explicitly given in a dependency
-specification, the default extras are not installed. For example, if a package
+If extras are explicitly given in a dependency specification, the default extras are not installed. Otherwise, the default extras are used.
+
+For example, if a package
 defines a ``extra1`` default extra as well as a non-default ``extra2``
 extra, then if a user was to install the package with::
 
@@ -340,8 +341,8 @@ This could be achieved with e.g:
 The ability for a package to reference itself in the extras is supported by
 existing Python packaging tools.
 
-Teaching to package users
--------------------------
+Teaching package authors
+------------------------
 
 Packages making use of any of the approaches above should ensure that they
 properly document the options available to users in terms of installation.
