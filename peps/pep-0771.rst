@@ -481,8 +481,8 @@ Ideally, one may want the following behavior:
     $ pip install package[frontend2]  # installs frontend2 and default backend
     $ pip install package[backend1, frontend2]  # installs backend1 and frontend2
 
-However, this PEP chooses not to provide a mechanism for having the fact that
-``backend1`` is specified disabling the default backend but keep the default
+However, this PEP chooses not to provide a mechanism for making it so that e.g., if
+``backend1`` is specified, this disabling the default backend but keeps the default
 frontend, since this adds complexity.
 
 Maintainers should instead for now document that if a backend or frontend is
