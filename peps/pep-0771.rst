@@ -789,11 +789,29 @@ There are two cases to consider here:
   will need to carefully consider how to treat default extras, and this may
   imply a non-negligible amount of work and discussion.
 
+While repackaging projects that use default extras requires decisions about
+how to map them, this does not make repackaging impossible. Repackagers
+already routinely handle concepts that have no direct equivalent in their
+target system – for example, extras themselves have no equivalent in conda,
+yet conda-forge successfully packages thousands of Python projects (with some
+recipes including extra dependencies as required, others omitting them, and
+others splitting packages into e.g. package-base and package). Some
+distribution systems already have concepts that map naturally to default
+extras: for example, Debian/Ubuntu and Fedora distinguish between ``Depends``
+(required) and ``Recommends`` (installed by default but removable) dependencies.
+
+When an upstream project introduces a default extra, the repackager can
+choose to include those dependencies as required or omit them. In cases where
+the default extra contains dependencies that were previously required, the
+repackager may not need to change anything at all – their existing recipe
+continues to work, and they gain the option to make those dependencies
+optional if the target distribution supports this.
+
 It is impossible for a PEP such as this to exhaustively consider each of the
-different package distributions. However, ultimately, default extras should be
-understood as how package authors would like their package to be installed for
-the majority of users, and this should inform decisions about how default extras
-should be handled, whether manually or automatically.
+different package distributions. However, ultimately, default extras provide
+additional signal about how package authors would like their package to be
+installed for the majority of users, and this should inform repackaging
+decisions regardless of the target distribution.
 
 Reference Implementation
 ========================
