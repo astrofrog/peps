@@ -120,6 +120,14 @@ imposes a significant and ongoing maintenance burden, introduces user-facing
 issues such as naming mismatches and unintuitive uninstallation behavior, and has
 proven impractical enough that most projects have chosen not to adopt it.
 
+The concept of default-but-optional dependencies has prior art in other
+ecosystems. Linux distributions such as Debian/Ubuntu and Fedora have long
+distinguished between required (``Depends``) and recommended (``Recommends``)
+dependencies, where recommended packages are installed by default but can be
+excluded. The Rust/Cargo ecosystem has had
+`default features <https://doc.rust-lang.org/cargo/reference/features.html#the-default-feature>`_
+for over 10 years, which are widely used.
+
 Specification
 =============
 
@@ -226,6 +234,16 @@ that the package should be installed *without* any default extras (unless
 extra *would* be installed as mentioned above). This
 would provide a universal way of obtaining a minimal installation of a package.
 
+When multiple packages in a dependency tree define default extras, the above
+rules apply independently to each package. For example, consider two packages
+``flask`` and ``werkzeug`` that both define default extras. If ``flask`` lists
+``werkzeug[]`` in its required dependencies and ``werkzeug`` (without ``[]``)
+in a default extra, then installing ``flask`` would include ``werkzeug`` with
+its own default extras (because the default extra causes ``werkzeug`` to appear
+bare), while installing ``flask[]`` would include only ``werkzeug[]`` (no
+default extras for either package). This follows from the rules above and
+requires no special handling of nested default extras.
+
 We also note that some tools such as `pip`_ currently ignore unrecognized
 extras, and emit a warning to the user to indicate that the extra has not been
 recognized, e.g:
@@ -248,6 +266,17 @@ that disables default extras for some or all packages regardless of where these
 packages appear in the dependency tree. If such tool-specific options are
 implemented, tool developers should make these opt-in,
 and users should experience the above PEP 771 behavior as default.
+
+Default extras do not change how dependencies within extras interact with
+platform compatibility. If a default extra includes a dependency that is only
+available on certain platforms, the dependency should use `environment markers
+<https://packaging.python.org/en/latest/specifications/dependency-specifiers/#environment-markers>`_
+as with any other dependency, e.g.::
+
+    Requires-Dist: windows-only-package ; sys_platform == "win32"
+
+The behavior of the installer when a dependency within a default extra cannot
+be satisfied on the current platform is the same as for any other extra.
 
 Examples
 --------
@@ -517,11 +546,55 @@ the default backend and frontend. They can then recommend that users do:
 This would allow (if desired) users to then get whatever the recommended backend
 is, even if that default changes in time.
 
-If there is a desire to implement a better solution in future, we believe this
-PEP should not preclude this. For example, one could imagine in future adding
+This limitation — the inability to deselect individual defaults while keeping
+others — is shared by Cargo's default features in the Rust ecosystem, where
+the only option is all-or-nothing via ``default-features = false``. If there
+is a desire to implement a better solution in future, we believe this PEP
+should not preclude this. For example, one could imagine in future adding
 the ability for an extra to specify *which* default extras it disables, and if
 this is not specified then explicitly specified extras would disable all default
 extras (consistent with the present PEP).
+
+Depending on packages with default extras
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The examples above focus on packages that *define* default extras. It is also
+useful to illustrate how downstream packages can *depend on* packages with
+default extras in their ``pyproject.toml``. The following examples assume
+that ``astropy`` has defined ``recommended`` as a default extra.
+
+A downstream package that is happy with the default extras needs no special
+syntax:
+
+.. code-block:: toml
+
+    [project]
+    dependencies = [
+        "astropy>=6.0",
+    ]
+
+A downstream library that wants only the minimal dependencies can use
+``package[]``:
+
+.. code-block:: toml
+
+    [project]
+    dependencies = [
+        "astropy[]>=6.0",
+    ]
+
+This syntax is backward-compatible: for versions of ``astropy`` that pre-date
+the introduction of default extras, ``astropy[]`` is equivalent to ``astropy``.
+
+A downstream package can also request specific extras, which will override
+the defaults:
+
+.. code-block:: toml
+
+    [project]
+    dependencies = [
+        "astropy[jupyter]>=6.0",
+    ]
 
 Backward Compatibility
 ======================
@@ -880,6 +953,12 @@ used. 'Best practices' documentation should mention:
   extras that should not remove default extras`_)
 * any instructions specific to packages that might have e.g. default backends
   *and* frontends (as described in `Packages with multiple kinds of defaults`_)
+
+It is also recommended that packages using default extras include a CI job
+that performs a minimal installation (without default extras) and verifies
+that core functionality still works. This helps ensure that the package does
+not accidentally rely on default extra dependencies for functionality that
+should be available in a minimal installation.
 
 Packaging repository maintainers
 --------------------------------
