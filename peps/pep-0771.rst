@@ -772,28 +772,29 @@ The impact on individuals who repackage Python libraries for different
 distributions, such as `conda <https://docs.conda.io>`_, `Homebrew
 <https://brew.sh/>`_, linux package installers (such as ``apt`` and ``yum``) and
 so on, needs to be considered. Not all package distributions have mechanisms
-that would line up with the approach described. In fact, some distributions such
-as conda, do not even have the concept of extras.
+that would line up with the approach described. In fact, some distributions do
+not even have the concept of extras (it is worth noting here that conda has
+recently added support for optional dependencies via `CEP 44
+<https://conda.org/learn/ceps/cep-0044>`_).
 
 There are two cases to consider here:
 
 * In cases where the repackaging is done by hand, such as for a number of conda-forge
-  recipes, and especially where there is no equivalent to extras, the
-  introduction of default extras should not have a large impact since manual
-  decisions already have to be made as to which dependencies to include (for
-  example, the conda-forge recipe for the `astropy`_ package mentioned in the
-  `Motivation`_ includes all the ``recommended`` dependencies by default since
-  there is no way for users to explicitly request them otherwise).
+  recipes, the introduction of default extras should not have a large impact
+  since manual decisions already have to be made as to which dependencies to
+  include (for example, the conda-forge recipe for the `astropy`_ package
+  mentioned in the `Motivation`_ includes all the ``recommended`` dependencies
+  by default).
 
-* In cases where the repackaging is done in an automated, way, distribution maintainers
+* In cases where the repackaging is done in an automated way, distribution maintainers
   will need to carefully consider how to treat default extras, and this may
   imply a non-negligible amount of work and discussion.
 
 While repackaging projects that use default extras requires decisions about
 how to map them, this does not make repackaging impossible. Repackagers
 already routinely handle concepts that have no direct equivalent in their
-target system – for example, extras themselves have no equivalent in conda,
-yet conda-forge successfully packages thousands of Python projects (with some
+target system – for example, until recently extras had no equivalent in conda,
+yet conda-forge has successfully packaged thousands of Python projects (with some
 recipes including extra dependencies as required, others omitting them, and
 others splitting packages into e.g. package-base and package). Some
 distribution systems already have concepts that map naturally to default
@@ -807,11 +808,9 @@ repackager may not need to change anything at all – their existing recipe
 continues to work, and they gain the option to make those dependencies
 optional if the target distribution supports this.
 
-It is impossible for a PEP such as this to exhaustively consider each of the
-different package distributions. However, ultimately, default extras provide
-additional signal about how package authors would like their package to be
-installed for the majority of users, and this should inform repackaging
-decisions regardless of the target distribution.
+Default extras provide additional signal about how package authors would like
+their package to be installed for the majority of users, and this should inform
+repackaging decisions regardless of the target distribution.
 
 Reference Implementation
 ========================
