@@ -931,13 +931,9 @@ repackaging decisions regardless of the target distribution.
 Reference Implementation
 ========================
 
-The following repository contains a fully functional demo package
-that makes use of default extras:
-
-https://github.com/wheel-next/pep_771
-
-This makes use of modified branches of several packages, and the following
-links are to these branches:
+The `following repository <https://github.com/wheel-next/pep_771>`_ contains a
+fully functional demo package that makes use of default extras. This makes use
+of modified branches of several packages:
 
 * `Setuptools <https://github.com/wheel-next/setuptools/tree/pep_771>`_
 * `pip <https://github.com/wheel-next/pip/tree/pep_771>`_
