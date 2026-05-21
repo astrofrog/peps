@@ -570,16 +570,12 @@ experience. There is currently no mechanism for users or downstream packages to
 opt out of such dependencies. This PEP provides a way for authors to separate
 truly required dependencies from recommended-but-optional ones, and introduces
 ``package[]`` as a standardized, universal way to obtain a minimal installation
--- something that does not exist today. Without this PEP, when an author
-includes a non-essential dependency in ``dependencies``, users have no recourse.
-With this PEP, the equivalent dependency placed in a default extra can be
-excluded using ``package[]``.
+-- something that does not exist today.
 
-It is also important to note that this PEP is opt-in: no existing package
-changes behavior until its maintainer explicitly adds default extras. Adopting
-default extras is a conscious metadata change that is no different in nature
-from any other metadata change authors routinely make, such as adding or
-removing required dependencies.
+This PEP is also opt-in: no existing package changes behavior until its
+maintainer explicitly adds default extras, which is no different in nature from
+other metadata changes authors routinely make, such as adding or removing
+required dependencies.
 
 Packaging-related tools
 -----------------------
@@ -796,12 +792,10 @@ conceptually one thing but has optional components that most users want — such
 as recommended performance or convenience dependencies, or a default backend
 for a package that supports multiple backends.
 
-It is also worth noting that the alternative approach of splitting packages into
-a core package and a meta-package (discussed in `Using a meta-package for
-recommended installations`_) carries its own risks of poor design: it can
-lead to confusing naming, version synchronization issues, and a worse user
-experience. Default extras provide a lighter-weight mechanism for the common
-cases where a full package split would be disproportionate.
+The alternative approach of splitting packages into a core package and a
+meta-package is discussed in detail in `Using a meta-package for recommended
+installations`_, along with the reasons it is not considered a compelling
+alternative.
 
 Inheriting from default extras
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -918,7 +912,7 @@ already routinely handle concepts that have no direct equivalent in their
 target system – for example, until recently extras had no equivalent in conda,
 yet conda-forge has successfully packaged thousands of Python projects (with some
 recipes including extra dependencies as required, others omitting them, and
-others splitting packages into e.g. package-base and package). Some
+others splitting packages into e.g. ``package-base`` and ``package``). Some
 distribution systems already have concepts that map naturally to default
 extras: for example, Debian/Ubuntu and Fedora distinguish between ``Depends``
 (required) and ``Recommends`` (installed by default but removable) dependencies.
