@@ -313,7 +313,7 @@ If this package was called ``package``, users installing ``package`` would
 then get the equivalent of ``package[recommended]``. Users could alternatively
 install ``package[]`` which would install the package without the default extras.
 
-To take a one of the concrete examples of package from the `Motivation`_
+To take one of the concrete examples from the `Motivation`_
 section, the `astropy`_ package defines a ``recommended`` extra that users are
 currently instructed to install in the default installation instructions.
 With this PEP, the ``recommended`` extra could be declared as being a default
@@ -752,7 +752,7 @@ following recommendations would apply:
   with older versions of package installers, the documentation should still mention
   the extra explicitly as long as possible (until it is clear that most/all users
   are using package installers that implement this PEP). There is no downside to
-  keeping the extra be explicitly mentioned, but this will ensure that users with
+  keeping the extra explicitly mentioned, but this will ensure that users with
   modern tooling who do not read documentation (which may be a non-negligible
   fraction of the user community) will start getting the recommended
   dependencies by default.
@@ -966,11 +966,10 @@ Packaging repository maintainers
 The impact on individuals who repackage Python libraries for different
 distributions, such as `conda <https://docs.conda.io>`_, `Homebrew
 <https://brew.sh/>`_, linux package installers (such as ``apt`` and ``yum``) and
-so on, needs to be considered. Not all package distributions have mechanisms
-that would line up with the approach described. In fact, some distributions do
-not even have the concept of extras (it is worth noting here that conda has
-recently added support for optional dependencies via `CEP 44
-<https://conda.org/learn/ceps/cep-0044>`_).
+so on, needs to be considered. Not all package distributions have historically
+had mechanisms that would line up with the approach described, although this is
+evolving (for example, conda has recently added support for optional
+dependencies via `CEP 44 <https://conda.org/learn/ceps/cep-0044>`_).
 
 There are two cases to consider here:
 
