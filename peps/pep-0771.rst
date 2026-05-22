@@ -234,6 +234,14 @@ that the package should be installed *without* any default extras (unless
 extra *would* be installed as mentioned above). This
 would provide a universal way of obtaining a minimal installation of a package.
 
+If a package is already installed without its default extras (for example,
+because it was pulled in as a dependency via ``package[]``), and a user
+subsequently runs ``pip install package`` (or equivalent), the installer should
+ensure that the default extras' dependencies are installed. In other words,
+a bare ``package`` specification should always be treated as requesting the
+package with its default extras, regardless of whether the package is already
+present in the environment.
+
 When multiple packages in a dependency tree define default extras, the above
 rules apply independently to each package. For example, consider two packages
 ``flask`` and ``werkzeug`` that both define default extras. If ``flask`` lists
