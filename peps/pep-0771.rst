@@ -160,22 +160,24 @@ New key in ``[project]`` metadata table
 A new key will be added to the ``[project]`` table in project metadata as
 originally defined in :pep:`621` and now defined in the `PyPA specifications
 <https://packaging.python.org/en/latest/specifications/pyproject-toml/>`_. This key will be named
-``default-optional-dependency-keys`` with the following description:
+``default-optional-dependencies`` with the following description:
 
 * `TOML <https://toml.io/>`_ type: Array of strings
 * Corresponding core metadata field: ``Default-Extra``
 
-Each string in ``default-optional-dependency-keys`` must be the name of an extra
+Each string in ``default-optional-dependencies`` must be the name of an extra
 defined in `optional-dependencies
 <https://packaging.python.org/en/latest/specifications/pyproject-toml/#dependencies-optional-dependencies>`_,
 and each extra in this array will be converted to a matching ``Default-Extra``
-entry in the core package metadata. Examples of valid usage which would
+entry in the core package metadata. Build backends must raise an error if any
+of the strings do not match the name of a defined extra. Examples of valid
+usage which would
 produce the example ``Default-Extra`` entries presented in the previous section are:
 
 .. code-block:: toml
 
     [project]
-    default-optional-dependency-keys = [
+    default-optional-dependencies = [
         "recommended",
     ]
 
@@ -184,7 +186,7 @@ and:
 .. code-block:: toml
 
     [project]
-    default-optional-dependency-keys = [
+    default-optional-dependencies = [
         "backend1",
         "backend2",
         "backend3"
@@ -307,7 +309,7 @@ would choose to have this be included as a default extra:
 .. code-block:: toml
 
     [project]
-    default-optional-dependency-keys = [
+    default-optional-dependencies = [
         "recommended"
     ]
 
@@ -330,7 +332,7 @@ extra:
 .. code-block:: toml
 
     [project]
-    default-optional-dependency-keys = [
+    default-optional-dependencies = [
         "recommended"
     ]
 
@@ -371,7 +373,7 @@ for each backend or frontend, and provide a default, e.g.:
 .. code-block:: toml
 
     [project]
-    default-optional-dependency-keys = [
+    default-optional-dependencies = [
         "backend1"
     ]
 
@@ -398,7 +400,7 @@ could define the following configuration:
 .. code-block:: toml
 
     [project]
-    default-optional-dependency-keys = [
+    default-optional-dependencies = [
         "pyqt5"
     ]
 
@@ -450,7 +452,7 @@ This could be achieved with e.g:
 .. code-block:: toml
 
     [project]
-    default-optional-dependency-keys = [
+    default-optional-dependencies = [
         "recommended"
     ]
 
@@ -482,7 +484,7 @@ configuration would solve this case:
 .. code-block:: toml
 
     [project]
-    default-optional-dependency-keys = [
+    default-optional-dependencies = [
         "recommended"
     ]
 
