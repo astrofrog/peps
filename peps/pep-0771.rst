@@ -118,7 +118,7 @@ a core package and a meta-package (discussed in detail in `Using a meta-package
 for recommended installations`_) — can technically achieve similar outcomes but
 imposes a significant and ongoing maintenance burden, introduces user-facing
 issues such as naming mismatches and unintuitive uninstallation behavior, and has
-proven impractical enough that most projects have chosen not to adopt it.
+proven impractical enough that many projects have chosen not to adopt it.
 
 The concept of default-but-optional dependencies has prior art in other
 ecosystems. Linux distributions such as Debian/Ubuntu and Fedora have long
@@ -962,8 +962,9 @@ used. 'Best practices' documentation should mention:
 * any instructions specific to packages that might have e.g. default backends
   *and* frontends (as described in `Packages with multiple kinds of defaults`_)
 
-It is also recommended that packages using default extras include a CI job
-that performs a minimal installation (without default extras) and verifies
+It is also recommended that packages using default extras include a continuous
+integration (CI) job that performs a minimal installation (without default
+extras) and verifies
 that core functionality still works. This helps ensure that the package does
 not accidentally rely on default extra dependencies for functionality that
 should be available in a minimal installation.
