@@ -25,7 +25,7 @@ Motivation
 ==========
 
 Various use cases for default extras and possible solutions in this PEP were discussed
-extensively on `this DPO thread <https://discuss.python.org/t/adding-a-default-extra-require-environment/4898>`__.
+extensively on `this discuss.python.org thread <https://discuss.python.org/t/adding-a-default-extra-require-environment/4898>`__.
 These fall into two broad cases that provide the
 motivation for the present PEP.
 
@@ -102,7 +102,7 @@ Rationale
 =========
 
 A number of possible solutions have been discussed extensively by
-the community for several years, including in `this DPO thread
+the community for several years, including in `this discuss.python.org thread
 <https://discuss.python.org/t/adding-a-default-extra-require-environment/4898>`__
 as well as in numerous issues and pull requests. The solution that is
 presented below:
@@ -152,7 +152,7 @@ Examples::
 
 Since this introduces a new field in the core package metadata, this will require
 `Metadata-Version <https://packaging.python.org/en/latest/specifications/core-metadata/#metadata-version>`_
-to be bumped to the next minor version (2.5 at the time of writing).
+to be bumped to the next minor version (2.7 at the time of writing).
 
 New key in ``[project]`` metadata table
 ---------------------------------------
@@ -171,8 +171,7 @@ defined in `optional-dependencies
 and each extra in this array will be converted to a matching ``Default-Extra``
 entry in the core package metadata. Build backends must raise an error if any
 of the strings do not match the name of a defined extra. Examples of valid
-usage which would
-produce the example ``Default-Extra`` entries presented in the previous section are:
+usage which would produce the example ``Default-Extra`` entries presented in the previous section are:
 
 .. code-block:: toml
 
@@ -217,7 +216,7 @@ would be ignored.
 
 If the same package is specified multiple times in an installation command or
 dependency tree, the default extras must be installed if any of the instances of
-the package are specified without extras.  For instance, if one installs a
+the package are specified without extras. For instance, if one installs a
 package ``spam`` where ``package`` appears several times in the dependency
 tree::
 
@@ -256,7 +255,7 @@ requires no special handling of nested default extras.
 
 We also note that some tools such as `pip`_ currently ignore unrecognized
 extras, and emit a warning to the user to indicate that the extra has not been
-recognized, e.g:
+recognized, e.g.:
 
 .. code-block:: console
 
@@ -447,7 +446,7 @@ default extras. Essentially, they might want:
 * ``package[alternative]`` to not install default extras, but to install an alternative set of optional dependencies (in an ``alternative`` extra)
 * ``package[additional]`` to install both recommended and additional dependencies (in an ``additional`` extra)
 
-This could be achieved with e.g:
+This could be achieved with e.g.:
 
 .. code-block:: toml
 
@@ -665,9 +664,9 @@ Packaging-related tools
 
 The most significant backward-compatibility aspect is related to assumptions
 packaging tools make about extras -- specifically, this PEP changes the
-assumption that extras are no longer exclusively additive in terms of adding
-dependencies to the dependency tree, and specifying some extras can result in
-fewer dependencies being installed.
+assumption that extras are exclusively additive in terms of adding
+dependencies to the dependency tree: with default extras, specifying some
+extras can result in fewer dependencies being installed.
 
 A specific example of change in behavior can be seen with `pip`_: consider a
 package ``package`` which has a required dependency of ``numpy``, and a default
@@ -697,7 +696,7 @@ resolving the dependency tree, but the point here is to illustrate that there
 may be changes in behavior in packaging tools due to the change in the
 assumption about what impact an extra can have.
 
-It is worth noting that the recently-accepted :pep:`751` defines a new file
+It is worth noting that :pep:`751` (accepted in 2025) defines a new file
 format which is intended to replace alternatives such as the ``pip freeze``
 output and other tools in future. The new file format is designed so that the
 packages in the file are installed *without* resolving dependencies, which means
@@ -751,7 +750,7 @@ following recommendations would apply:
 
 * Moving a package from being a required dependency to a default extra would be
   a breaking change, because older versions of package installers would not
-  recognise the concept of default extras, and would then install the package
+  recognize the concept of default extras, and would then install the package
   with fewer dependencies, which could affect users that would have been relying
   on these. Therefore, changing dependencies from required to a default extra in
   an established package should only be done in future once the developers only
@@ -966,17 +965,16 @@ used. 'Best practices' documentation should mention:
 
 It is also recommended that packages using default extras include a continuous
 integration (CI) job that performs a minimal installation (without default
-extras) and verifies
-that core functionality still works. This helps ensure that the package does
-not accidentally rely on default extra dependencies for functionality that
-should be available in a minimal installation.
+extras) and verifies that core functionality still works. This helps ensure
+that the package does not accidentally rely on default extra dependencies for
+functionality that should be available in a minimal installation.
 
 Packaging repository maintainers
 --------------------------------
 
 The impact on individuals who repackage Python libraries for different
 distributions, such as `conda <https://docs.conda.io>`_, `Homebrew
-<https://brew.sh/>`_, linux package installers (such as ``apt`` and ``yum``) and
+<https://brew.sh/>`_, Linux package installers (such as ``apt`` and ``dnf``) and
 so on, needs to be considered. Not all package distributions have historically
 had mechanisms that would line up with the approach described, although this is
 evolving (for example, conda has recently added support for optional
@@ -1091,8 +1089,8 @@ approach:
   new metapackage with a different name, such as ``package-all``. However, this
   suffers from one of the problems that motivated this PEP in the first place -
   users are often not aware that they can do e.g. ``package[recommended]``, so
-  in the same way, they might not realise that ``package-all`` exists. This once
-  again places the burden on the average user to discover this, rather then
+  in the same way, they might not realize that ``package-all`` exists. This once
+  again places the burden on the average user to discover this, rather than
   shifting some of the burden to more advanced users.
 
 * The second option is for the existing package to be renamed to e.g. ``package-core``, and
@@ -1166,7 +1164,7 @@ user doing:
 
     $ pip uninstall package
 
-will still be left with ``package-core``, but may not realise it. This is
+will still be left with ``package-core``, but may not realize it. This is
 not just confusing, but is in effect a breaking change that may impact a number
 of existing workflows.
 
