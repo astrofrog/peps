@@ -195,6 +195,16 @@ and:
         "backend3"
     ]
 
+As with other keys in the ``[project]`` table, ``default-optional-dependencies``
+may be listed in ``dynamic``, in which case the build backend is responsible
+for determining the default extras. Since its value is an array, it may also be
+specified statically and listed in ``dynamic`` simultaneously, following the
+rules for list-valued keys introduced in :pep:`808`. In all cases the entries
+must be validated against the final set of extras produced by the build
+backend, including when ``optional-dependencies`` is itself dynamic.
+Correspondingly, ``Default-Extra`` may be listed in the ``Dynamic`` field of a
+source distribution's core metadata.
+
 Overriding default extras
 -------------------------
 
